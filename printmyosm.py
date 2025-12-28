@@ -1,3 +1,4 @@
+from collections import deque
 import math
 
 vertices = [
@@ -63,15 +64,26 @@ def point_inside_polygon(y, x):
 
 class Tile:
     def __init__(self, zoom, x, y):
-        self.zoom = 2 ** zoom
+        self.zoom = zoom
         self.x = x
         self.y = y
 
+    def get_xy(self):
+        return self.x, self.y
+
     def get_latitude(self, plus_one=False):
-        return math.atan(math.sinh(math.pi * (1 - 2 * (self.y + plus_one) / self.zoom))) * 180 / math.pi
+        return math.atan(math.sinh(math.pi * (1 - 2 * (self.y + plus_one) / (2 ** self.zoom)))) * 180 / math.pi
 
     def get_longitude(self, plus_one=False):
-        return (self.x + plus_one) / self.zoom * 360 - 180
+        return (self.x + plus_one) / (2 ** self.zoom) * 360 - 180
+
+    def get_neighbors(self):
+        return [
+            Tile(self.zoom, self.x + 1, self.y),
+            Tile(self.zoom, self.x - 1, self.y),
+            Tile(self.zoom, self.x, self.y + 1),
+            Tile(self.zoom, self.x, self.y - 1)
+        ]
 
     @staticmethod
     def for_coordinates(zoom, latitude, longitude):
@@ -91,3 +103,22 @@ class Tile:
                     return True
 
         return False
+
+first_tile = Tile.for_coordinates(14, *vertices[0])
+queue = deque([first_tile])
+visited = set()
+tiles = []
+
+while queue:
+    tile = queue.popleft()
+    if tile.get_xy() in visited:
+        continue
+
+    visited.add(tile.get_xy())
+
+    if not tile.is_in_polygon():
+        continue
+
+    tiles.append(tile)
+    for neighbor in tile.get_neighbors():
+        queue.append(neighbor)
