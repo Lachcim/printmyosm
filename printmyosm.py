@@ -1,5 +1,8 @@
 from collections import deque
 import math
+import requests
+import time
+import os
 
 vertices = [
     (50.8213, 21.8350),
@@ -104,6 +107,23 @@ class Tile:
 
         return False
 
+    def download(self):
+        url = f"https://tile.tracestrack.com/topo__/{self.zoom}/{self.x}/{self.y}.webp?key=383118983d4a867dd2d367451720d724"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+            "Referer": "https://www.openstreetmap.org/"
+        }
+
+        response = requests.get(url, headers=headers, stream=True)
+        assert response.status_code == 200
+
+        os.makedirs("tiles", exist_ok=True)
+        with open(self.get_filename(), "wb") as file:
+            file.write(response.content)
+
+    def get_filename(self):
+        return f"tiles/{self.zoom}-{self.x}-{self.y}.webp"
+
 first_tile = Tile.for_coordinates(14, *vertices[0])
 queue = deque([first_tile])
 visited = set()
@@ -122,3 +142,19 @@ while queue:
     tiles.append(tile)
     for neighbor in tile.get_neighbors():
         queue.append(neighbor)
+
+downloaded_count = 0
+for tile in tiles:
+    print(f"Getting {tile.get_xy()}... ", end="", flush=True)
+
+    if os.path.isfile(tile.get_filename()):
+        downloaded_count += 1
+        print(f"Already downloaded {downloaded_count / len(tiles) * 100}%")
+        continue
+
+    tile.download()
+
+    downloaded_count += 1
+    print(f"Downloaded {downloaded_count / len(tiles) * 100}%")
+
+    time.sleep(1)
