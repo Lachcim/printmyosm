@@ -20,17 +20,58 @@ vertices = [
     (50.6999, 21.8841),
 ]
 
+def pairwise(iterable):
+    iterator = iter(iterable)
+    a = next(iterator, None)
+    first = a
+
+    for b in iterator:
+        if a[1] <= b[1]:
+            yield a, b
+        else:
+            yield b, a
+        a = b
+
+    if a[1] <= first[1]:
+        yield a, first
+    else:
+        yield first, a
+
+def point_inside_polygon(y, x):
+    inside = False
+    for (ay, ax), (by, bx) in pairwise(vertices):
+        if ay > y and by > y:
+            continue
+        if ay < y and by < y:
+            continue
+
+        if ax > x:
+            continue
+
+        if ax < x and bx < x:
+            inside = not inside
+            continue
+
+        slope = (by - ay) / (bx - ax)
+        base = ay - slope * ax
+        cutoff_point = (y - base) / slope
+
+        if x > cutoff_point:
+            inside = not inside
+
+    return inside
+
 class Tile:
     def __init__(self, zoom, x, y):
         self.zoom = 2 ** zoom
         self.x = x
         self.y = y
 
-    def get_latitude(self):
-        return math.atan(math.sinh(math.pi * (1 - 2 * self.y / self.zoom))) * 180 / math.pi
+    def get_latitude(self, plus_one=False):
+        return math.atan(math.sinh(math.pi * (1 - 2 * (self.y + plus_one) / self.zoom))) * 180 / math.pi
 
-    def get_longitude(self):
-        return self.x / self.zoom * 360 - 180
+    def get_longitude(self, plus_one=False):
+        return (self.x + plus_one) / self.zoom * 360 - 180
 
     @staticmethod
     def for_coordinates(zoom, latitude, longitude):
@@ -38,8 +79,15 @@ class Tile:
         y = math.floor(2 ** (zoom - 1) * (1 - (math.log(math.tan(latitude / 180 * math.pi) + (1 / math.cos(latitude / 180 * math.pi))) / math.pi)))
         return Tile(zoom, x, y)
 
-    def is_in_polygon(vertices):
-        x = self.get_longitude()
-        y = self.get_latitude()
+    def is_in_polygon(self):
+        x1 = self.get_longitude()
+        x2 = self.get_longitude(plus_one=True)
+        y1 = self.get_latitude()
+        y2 = self.get_latitude(plus_one=True)
 
-        pass
+        for x in (x1, x2):
+            for y in (y1, y2):
+                if point_inside_polygon(y, x):
+                    return True
+
+        return False
