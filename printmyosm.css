@@ -1,0 +1,55 @@
+body {
+    font-family: Oswald, sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+
+    margin: 0;
+}
+
+section {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+
+    page-break-after: always;
+}
+section > div {
+    margin: 1cm;
+}
+section.title-page > div {
+    display: flex;
+    flex-direction: column;
+}
+
+div.title {
+    margin: 1cm 0;
+}
+div.title > h1 {
+    font-size: 48pt;
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 400;
+    line-height: 112%;
+
+    color: #FFFFFF;
+    background-color: #344E41;
+
+    display: inline;
+    padding: 0 0.25em 0 3cm;
+    box-decoration-break: clone;
+
+    position: relative;
+    left: -2cm;
+}
+
+div.map-preview {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+a {
+    color: #588157;
+    text-decoration: none;
+}
