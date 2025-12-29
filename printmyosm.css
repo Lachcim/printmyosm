@@ -7,7 +7,7 @@ body {
 }
 
 section {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
 
     page-break-after: always;
@@ -73,7 +73,7 @@ a {
 
 label.file {
     color: #FFFFFF;
-    background-color: #3A5A40;
+    background-color: #344E41;
 
     padding: 0.25em 0.5em 0.5em;
     display: inline-block;
@@ -81,5 +81,5 @@ label.file {
     cursor: pointer;
 }
 label.file:hover {
-    background-color: #344E41;
+    background-color: #3A5A40;
 }
