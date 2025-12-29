@@ -52,7 +52,16 @@ div.post-title-center {
     align-items: center;
     justify-content: center;
 }
-
+div.credits {
+    font-size: 16px;
+}
+div.credits p {
+    margin: 0;
+}
+div.credits p.fine-print {
+    font-size: 12px;
+    margin-top: 1em;
+}
 section.tiles {
     align-items: center;
     justify-content: center;
