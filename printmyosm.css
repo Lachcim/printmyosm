@@ -1,17 +1,19 @@
 body {
     font-family: Oswald, sans-serif;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 300;
 
     margin: 0;
 }
 
 section {
-    width: 100vw;
     height: 100vh;
     display: flex;
 
     page-break-after: always;
+}
+section[hidden] {
+    display: none;
 }
 section > div {
     margin: 1cm;
@@ -19,6 +21,7 @@ section > div {
 section.title-page > div {
     display: flex;
     flex-direction: column;
+    flex: 1;
 }
 
 div.title {
@@ -41,7 +44,7 @@ div.title > h1 {
     left: -2cm;
 }
 
-div.map-preview {
+div.post-title-center {
     flex: 1;
 
     display: flex;
@@ -52,4 +55,17 @@ div.map-preview {
 a {
     color: #588157;
     text-decoration: none;
+}
+
+label.file {
+    color: #FFFFFF;
+    background-color: #3A5A40;
+
+    padding: 0.25em 0.5em 0.5em;
+    display: inline-block;
+
+    cursor: pointer;
+}
+label.file:hover {
+    background-color: #344E41;
 }
