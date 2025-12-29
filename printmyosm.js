@@ -28,6 +28,47 @@ class Page {
             yTile++;
         }
     }
+
+    getRightNeighbor() {
+        const tileDifference = Math.floor((this.map.getPagePrintableWidth() - this.xOffset) / this.map.tileSize);
+        const offsetDifference = this.map.tileSize * tileDifference - this.map.getPagePrintableWidth();
+
+        if (this.firstFullTileX + tileDifference > this.map.maxX)
+            return null;
+
+        return new Page(
+            this.map,
+            this.firstFullTileX + tileDifference,
+            this.firstFullTileY,
+            this.xOffset + offsetDifference,
+            this.yOffset
+        );
+    }
+
+    getBottomNeighbor() {
+        const tileDifference = Math.floor((this.map.getPagePrintableHeight() - this.yOffset) / this.map.tileSize);
+        const offsetDifference = this.map.tileSize * tileDifference - this.map.getPagePrintableHeight();
+
+        if (this.firstFullTileY + tileDifference > this.map.maxY)
+            return null;
+
+        return new Page(
+            this.map,
+            this.firstFullTileX,
+            this.firstFullTileY + tileDifference,
+            this.xOffset,
+            this.yOffset + offsetDifference
+        );
+    }
+
+    isNull() {
+        for (const tile of this) {
+            if (this.map.tiles.get(tile.y)?.has(tile.x))
+                return false;
+        }
+
+        return true;
+    }
 }
 
 class TileMap {
@@ -115,34 +156,50 @@ class TileMap {
             yInitialOffset.millimeters
         );
 
-        this.pages.push(firstPage);
+        let page = firstPage;
+        let rowStart = page;
+        while (page) {
+            if (!page.isNull())
+                this.pages.push(page);
+
+            page = page.getRightNeighbor();
+            if (!page) {
+                page = rowStart.getBottomNeighbor();
+                rowStart = page;
+            }
+        }
     }
 }
 
 function renderTileMap(tileMap) {
-    const section = document.createElement("section");
-    const sectionBody = document.createElement("div");
+    for (const page of tileMap.pages) {
+        const section = document.createElement("section");
+        const sectionBody = document.createElement("div");
 
-    section.className = "tiles";
-    sectionBody.style.width = `${tileMap.getPagePrintableWidth()}mm`;
-    sectionBody.style.height = `${tileMap.getPagePrintableHeight()}mm`;
+        section.className = "tiles";
+        sectionBody.style.width = `${tileMap.getPagePrintableWidth()}mm`;
+        sectionBody.style.height = `${tileMap.getPagePrintableHeight()}mm`;
 
-    document.body.appendChild(section);
-    section.appendChild(sectionBody);
+        section.setAttribute("xOffset", page.xOffset);
+        section.setAttribute("yOffset", page.yOffset);
 
-    for (const tile of tileMap.pages[0]) {
-        const src = tileMap.tiles.get(tile.y)?.get(tile.x);
-        if (!src)
-            continue;
+        document.body.appendChild(section);
+        section.appendChild(sectionBody);
 
-        const tileImg = document.createElement("img");
-        tileImg.style.width = `${tileMap.tileSize}mm`;
-        tileImg.style.height = `${tileMap.tileSize}mm`;
-        tileImg.style.left = `${tile.left}mm`;
-        tileImg.style.top = `${tile.top}mm`;
-        tileImg.src = src;
+        for (const tile of page) {
+            const src = tileMap.tiles.get(tile.y)?.get(tile.x);
+            if (!src)
+                continue;
 
-        sectionBody.append(tileImg);
+            const tileImg = document.createElement("img");
+            tileImg.style.width = `${tileMap.tileSize}mm`;
+            tileImg.style.height = `${tileMap.tileSize}mm`;
+            tileImg.style.left = `${tile.left}mm`;
+            tileImg.style.top = `${tile.top}mm`;
+            tileImg.src = src;
+
+            sectionBody.append(tileImg);
+        }
     }
 }
 
