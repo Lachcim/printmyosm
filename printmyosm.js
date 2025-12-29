@@ -91,7 +91,7 @@ class TileMap {
         this.maxY = null;
 
         this.tiles = new Map();
-        this.pages = [];
+        this.pages = new Map();
 
         for (const file of files) {
             const nameElements = file.name.substring(0, file.name.indexOf(".")).split("-");
@@ -158,30 +158,41 @@ class TileMap {
 
         let page = firstPage;
         let rowStart = page;
+        let pageX = 0;
+        let pageY = 0;
+
         while (page) {
-            if (!page.isNull())
-                this.pages.push(page);
+            if (!page.isNull()) {
+                if (!this.pages.has(pageY))
+                    this.pages.set(pageY, new Map());
+
+                this.pages.get(pageY).set(pageX, page);
+            }
 
             page = page.getRightNeighbor();
+            pageX++;
+
             if (!page) {
                 page = rowStart.getBottomNeighbor();
                 rowStart = page;
+
+                pageX = 0;
+                pageY++;
             }
         }
     }
 }
 
 function renderTileMap(tileMap) {
-    for (const page of tileMap.pages) {
+    tileMap.pages.entries().forEach(([y, column]) => column.entries().forEach(([x, page]) => {
         const section = document.createElement("section");
         const sectionBody = document.createElement("div");
 
         section.className = "tiles";
+        section.setAttribute("data-x", x);
+        section.setAttribute("data-y", y);
         sectionBody.style.width = `${tileMap.getPagePrintableWidth()}mm`;
         sectionBody.style.height = `${tileMap.getPagePrintableHeight()}mm`;
-
-        section.setAttribute("xOffset", page.xOffset);
-        section.setAttribute("yOffset", page.yOffset);
 
         document.body.appendChild(section);
         section.appendChild(sectionBody);
@@ -200,6 +211,60 @@ function renderTileMap(tileMap) {
 
             sectionBody.append(tileImg);
         }
+    }));
+}
+
+function updatePageNumbers() {
+    const sections = document.querySelectorAll("section.tiles");
+
+    let pageNumber = 1;
+    const pageNumbers = new Map();
+
+    for (const section of sections) {
+        const existingElements = section.querySelectorAll(".page-number, .page-hint");
+        existingElements.forEach(element => element.remove());
+
+        const pageNumberElement = document.createElement("p");
+        pageNumberElement.className = "page-number";
+        pageNumberElement.innerText = pageNumber;
+        section.appendChild(pageNumberElement);
+
+        const pageX = parseInt(section.getAttribute("data-x"));
+        const pageY = parseInt(section.getAttribute("data-y"));
+
+        if (!pageNumbers.has(pageY))
+            pageNumbers.set(pageY, new Map());
+
+        pageNumbers.get(pageY).set(pageX, pageNumber);
+        pageNumber++;
+    }
+
+    for (const section of sections) {
+        const pageX = parseInt(section.getAttribute("data-x"));
+        const pageY = parseInt(section.getAttribute("data-y"));
+
+        const neighbors = {
+            up: pageNumbers.get(pageY - 1)?.get(pageX),
+            right: pageNumbers.get(pageY)?.get(pageX + 1),
+            down: pageNumbers.get(pageY + 1)?.get(pageX),
+            left: pageNumbers.get(pageY)?.get(pageX - 1)
+        };
+
+        for (const [relation, page] of Object.entries(neighbors)) {
+            if (!page)
+                continue;
+
+            const pageHint = document.createElement("p");
+            pageHint.className = `page-hint ${relation}`;
+            pageHint.innerText = page;
+
+            const arrow = document.createElement("img");
+            arrow.className = "arrow";
+            arrow.src = "img/arrow.svg";
+
+            pageHint.insertBefore(arrow, pageHint.childNodes[0]);
+            section.appendChild(pageHint);
+        }
     }
 }
 
@@ -208,6 +273,10 @@ function handleUpload(event) {
     tileMap.generatePages();
 
     renderTileMap(tileMap);
+    updatePageNumbers();
+
+    document.getElementById("home").hidden = true;
+    document.getElementById("cover").hidden = false;
 }
 
 window.addEventListener("load", () => {

@@ -8,9 +8,10 @@ body {
 
 section {
     min-height: 100vh;
-    display: flex;
-
     page-break-after: always;
+
+    display: flex;
+    position: relative;
 }
 section[hidden] {
     display: none;
@@ -64,6 +65,76 @@ section.tiles > div {
 }
 section.tiles > div > img {
     position: absolute;
+}
+
+.page-number {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    font-size: 20px;
+    margin: 0;
+
+    width: 1.2cm;
+    height: 1.2cm;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.page-hint {
+    position: absolute;
+
+    font-size: 16px;
+    margin: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.page-hint.up {
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 1.2cm;
+}
+.page-hint.up > .arrow {
+    transform: rotate(270deg);
+}
+.page-hint.down {
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 1.2cm;
+}
+.page-hint.down > .arrow {
+    transform: rotate(90deg);
+}
+.page-hint.left {
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 1.2cm;
+
+    writing-mode: sideways-lr;
+}
+.page-hint.left > .arrow {
+    transform: rotate(180deg);
+}
+.page-hint.right {
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 1.2cm;
+
+    writing-mode: sideways-lr;
+}
+.arrow {
+    height: 1em;
 }
 
 a {
