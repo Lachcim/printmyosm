@@ -50,7 +50,7 @@ class TileMap {
         this.maxY = null;
 
         this.tiles = new Map();
-        this.pages = new Map();
+        this.pages = [];
 
         for (const file of files) {
             const nameElements = file.name.substring(0, file.name.indexOf(".")).split("-");
@@ -115,14 +115,42 @@ class TileMap {
             yInitialOffset.millimeters
         );
 
-        const tiles = Array.from(firstPage);
-        console.log(firstPage, tiles);
+        this.pages.push(firstPage);
+    }
+}
+
+function renderTileMap(tileMap) {
+    const section = document.createElement("section");
+    const sectionBody = document.createElement("div");
+
+    section.className = "tiles";
+    sectionBody.style.width = `${tileMap.getPagePrintableWidth()}mm`;
+    sectionBody.style.height = `${tileMap.getPagePrintableHeight()}mm`;
+
+    document.body.appendChild(section);
+    section.appendChild(sectionBody);
+
+    for (const tile of tileMap.pages[0]) {
+        const src = tileMap.tiles.get(tile.y)?.get(tile.x);
+        if (!src)
+            continue;
+
+        const tileImg = document.createElement("img");
+        tileImg.style.width = `${tileMap.tileSize}mm`;
+        tileImg.style.height = `${tileMap.tileSize}mm`;
+        tileImg.style.left = `${tile.left}mm`;
+        tileImg.style.top = `${tile.top}mm`;
+        tileImg.src = src;
+
+        sectionBody.append(tileImg);
     }
 }
 
 function handleUpload(event) {
     const tileMap = new TileMap(event.srcElement.files);
     tileMap.generatePages();
+
+    renderTileMap(tileMap);
 }
 
 window.addEventListener("load", () => {

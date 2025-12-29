@@ -52,6 +52,20 @@ div.post-title-center {
     justify-content: center;
 }
 
+section.tiles {
+    align-items: center;
+    justify-content: center;
+}
+section.tiles > div {
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid #E0E0E0;
+}
+section.tiles > div > img {
+    position: absolute;
+}
+
 a {
     color: #588157;
     text-decoration: none;
