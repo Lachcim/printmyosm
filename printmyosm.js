@@ -98,10 +98,10 @@ class TileMap {
                 };
             }
 
-            return {
-                millimeters: (initialOffset - printableLength) % this.tileSize,
-                tiles: -Math.floor(initialOffset / this.tileSize)
-            }
+            const tiles = -Math.floor(initialOffset / this.tileSize);
+            const millimeters = initialOffset + (tiles - 1) * this.tileSize;
+
+            return { millimeters, tiles };
         };
 
         const xInitialOffset = getInitialOffset(this.maxX - this.minX + 1, this.getPagePrintableWidth());
