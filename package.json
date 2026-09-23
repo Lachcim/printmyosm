@@ -1,0 +1,47 @@
+{
+  "name": "PrintMyOSM",
+  "version": "1.0.0",
+  "description": "A tool for printing paper maps based on OpenStreetMap",
+  "homepage": "https://github.com/Lachcim/printmyosm#readme",
+  "bugs": {
+    "url": "https://github.com/Lachcim/printmyosm/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lachcim/printmyosm.git"
+  },
+  "type": "module",
+  "main": "printmyosm.js",
+  "scripts": {
+    "watch-frontend": "webpack --mode=development --watch",
+    "watch-backend": "node --watch backend/main.js",
+    "lint": "eslint --fix frontend backend *.config.js",
+    "lint-check": "eslint frontend backend *.config.js",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.6",
+    "@babel/preset-react": "^8.0.1",
+    "@eslint/compat": "^2.1.1",
+    "babel-loader": "^10.1.1",
+    "css-loader": "^7.1.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "html-webpack-plugin": "^5.6.8",
+    "husky": "^9.1.7",
+    "sass": "^1.105.0",
+    "sass-loader": "^17.0.1",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.111.1",
+    "webpack-cli": "^7.2.3"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.12.0",
+    "express": "^5.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-redux": "^9.3.0",
+    "redux": "^5.0.1"
+  }
+}
