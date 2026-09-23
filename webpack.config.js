@@ -40,6 +40,9 @@ export default {
             template: "index.html"
         })
     ],
+    resolve: {
+        extensions: [".js", ".jsx", ".css", ".scss"]
+    },
     experiments: {
         outputModule: true
     },
