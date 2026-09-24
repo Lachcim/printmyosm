@@ -19,12 +19,14 @@ export default class PrintArea extends Polygon {
         return pointAdded;
     }
 
+    static style = {
+        weight: 2,
+        color: "#31572C",
+        fill: false,
+        lineJoin: "miter"
+    };
+
     getStyle() {
-        return {
-            weight: 2,
-            color: "#31572C",
-            fill: false,
-            lineJoin: "miter"
-        };
+        return PrintArea.style;
     }
 }

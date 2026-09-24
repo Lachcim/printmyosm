@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 import { CircleMarker, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
 import { finishLine } from "./features";
 import Feature from "./feature";
 
-function PolylineVector({ points, style }) {
+const PolylineVector = memo(function PolylineVector({ points, style }) {
     return (
         <Polyline
             pathOptions={style}
@@ -13,7 +13,7 @@ function PolylineVector({ points, style }) {
             interactive={false}
         />
     );
-}
+});
 
 function UnfinshedPolylineVector({ points, style, onFinish }) {
     const mousePosition = useContext(MapHoverContext);
@@ -76,12 +76,14 @@ export default class Line extends Feature {
         delete this.unfinished;
     }
 
+    static style = {
+        weight: 1,
+        color: "#F44336",
+        dashArray: [10, 5]
+    };
+
     getStyle() {
-        return {
-            weight: 1,
-            color: "#F44336",
-            dashArray: [10, 5]
-        };
+        return Line.style;
     }
 
     render() {

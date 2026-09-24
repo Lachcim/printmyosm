@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 import { CircleMarker, Polygon as LeftletPolygon, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
 import { closePolygon } from "./features";
 import Feature from "./feature";
 
-function PolygonVector({ points, style }) {
+const PolygonVector = memo(function PolygonVector({ points, style }) {
     return (
         <LeftletPolygon
             pathOptions={style}
@@ -13,9 +13,9 @@ function PolygonVector({ points, style }) {
             interactive={false}
         />
     );
-}
+});
 
-function UnclosedPolygonVector({ points, style, onClose }) {
+const UnclosedPolygonVector = function UnclosedPolygonVector({ points, style, onClose }) {
     const mousePosition = useContext(MapHoverContext);
 
     const getCloseCircle = () => {
@@ -43,7 +43,7 @@ function UnclosedPolygonVector({ points, style, onClose }) {
             />
         </>
     );
-}
+};
 
 export default class Polygon extends Feature {
     constructor(json) {
@@ -79,12 +79,14 @@ export default class Polygon extends Feature {
         delete this.unclosed;
     }
 
+    static style = {
+        weight: 1,
+        color: "#BF360C",
+        fillOpacity: 0.1
+    };
+
     getStyle() {
-        return {
-            weight: 1,
-            color: "#BF360C",
-            fillOpacity: 0.1
-        };
+        return Polygon.style;
     }
 
     render() {
