@@ -25,7 +25,7 @@ function UnclosedPolygonVector({ points, style, onClose }) {
         return (
             <CircleMarker
                 center={points[0]}
-                radius={5}
+                radius={7}
                 pathOptions={{ ...style, fill: true }}
                 eventHandlers={{ click: onClose }}
                 bubblingMouseEvents={false}

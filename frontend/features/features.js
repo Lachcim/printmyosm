@@ -90,3 +90,11 @@ export function closePolygon(id) {
         store.dispatch(setTool(null));
     }
 }
+
+export function finishLine(id) {
+    const line = getFeatureById(id);
+    line.finish();
+
+    store.dispatch(updateFeature(line.toJson()));
+    store.dispatch(setTool(null));
+}
