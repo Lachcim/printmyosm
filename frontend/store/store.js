@@ -14,6 +14,7 @@ const initialState = {
 const store = configureStore({
     reducer: createReducer(initialState, builder => {
         builder.addCase(actions.setToolbarTab, reducers.reduceSetToolbarTab);
+        builder.addCase(actions.setTool, reducers.reduceSetTool);
     })
 });
 

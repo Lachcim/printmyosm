@@ -15,4 +15,13 @@
     &:hover, &.active {
         background-color: #31572C;
     }
+
+    &.secondary {
+        color: #000000;
+        background-color: #EEEEEE;
+
+        &:hover, &.active {
+            background-color: #BDBDBD;
+        }
+    }
 }

@@ -26,7 +26,7 @@ export default function Toolbar() {
             {
                 tabs.map(tab => (
                     <Button
-                        key={tab.label}
+                        key={tab.name}
                         className="toolbar-button"
                         active={currentTab == tab.name}
                         onClick={() => dispatch(setToolbarTab(tab.name))}

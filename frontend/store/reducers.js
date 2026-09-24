@@ -6,3 +6,7 @@ export function reduceSetToolbarTab(state, action) {
         state.toolbar.currentFeature = null;
     }
 }
+
+export function reduceSetTool(state, action) {
+    state.toolbar.currentTool = action.payload;
+}

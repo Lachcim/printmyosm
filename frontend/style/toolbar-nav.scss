@@ -1,5 +1,6 @@
 .toolbar-nav {
     display: flex;
+    gap: 0.5rem;
     margin-bottom: 1rem;
 
     .toolbar-button {
@@ -8,10 +9,6 @@
         flex: 1;
 
         font-size: 12pt;
-
-        &:not(:last-child) {
-            margin-right: 0.5rem;
-        }
 
         img {
             height: 2rem;

@@ -1,0 +1,11 @@
+.tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .tool-button {
+        text-align: left;
+        font-size: 12pt;
+        flex-basis: calc(50% - 0.25rem);
+    }
+}

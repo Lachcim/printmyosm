@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import ToolbarNav from "./toolbar-nav";
+import Tools from "./tools";
 
 import "../style/toolbar";
 
@@ -15,6 +16,7 @@ export default function Toolbar() {
                 tab == "features" && (
                     <div>
                         <h2>Tools</h2>
+                        <Tools/>
                     </div>
                 )
             }
