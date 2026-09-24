@@ -66,13 +66,19 @@ export function createFeature(stateProxy, type) {
 
 export function removeIncompleteFeature(stateProxy) {
     const id = stateProxy.toolbar.activeFeature;
-    stateProxy.toolbar.activeFeature = null;
-
     if (!id) return;
 
-    stateProxy.map.features = stateProxy.map.features.filter(
-        feature => feature.id != id || getFeatureFromJson(feature).complete
-    );
+    const json = stateProxy.map.features.find(feature => feature.id == id);
+    if (!json) {
+        stateProxy.toolbar.activeFeature = null;
+        return;
+    }
+
+    const resolvedFeature = getFeatureFromJson(json);
+    if (resolvedFeature.complete) return;
+
+    stateProxy.map.features = stateProxy.map.features.filter(feature => feature.id != id);
+    stateProxy.toolbar.activeFeature = null;
 }
 
 export function closePolygon(id) {

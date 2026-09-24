@@ -16,8 +16,6 @@ export function reduceSetTool(state, action) {
 
     if (action.payload != null)
         state.toolbar.activeFeature = createFeature(state, action.payload);
-    else
-        state.toolbar.activeFeature = null;
 }
 
 export function reduceSetZoomLevel(state, action) {
