@@ -23,6 +23,9 @@ export default {
                     options: {
                         presets: ["@babel/preset-react"]
                     }
+                },
+                resolve: {
+                    fullySpecified: false
                 }
             },
             {

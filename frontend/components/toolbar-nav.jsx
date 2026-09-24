@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 import Button from "./button";
 
@@ -8,8 +9,11 @@ import compass from "../assets/compass.svg";
 import document from "../assets/document.svg";
 import polygon from "../assets/polygon.svg";
 
+import { setToolbarTab } from "../store/actions";
+
 export default function Toolbar() {
-    const [currentTab, setCurrentTab] = useState("features");
+    const currentTab = useSelector(state => state.toolbar.tab);
+    const dispatch = useDispatch();
 
     const tabs = [
         { name: "features", label: "Features", icon: polygon },
@@ -25,7 +29,7 @@ export default function Toolbar() {
                         key={tab.label}
                         className="toolbar-button"
                         active={currentTab == tab.name}
-                        onClick={() => setCurrentTab(tab.name)}
+                        onClick={() => dispatch(setToolbarTab(tab.name))}
                     >
                         <img src={tab.icon}/>
                         { tab.label }
