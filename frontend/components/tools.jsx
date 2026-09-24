@@ -8,7 +8,7 @@ import "../style/tools";
 import { setTool } from "../store/actions";
 
 export default function Tools() {
-    const currentTool = useSelector(state => state.toolbar.currentTool);
+    const activeTool = useSelector(state => state.toolbar.tool);
     const dispatch = useDispatch();
 
     const tools = [
@@ -27,7 +27,7 @@ export default function Tools() {
                         key={tool.name}
                         secondary
                         className="tool-button"
-                        active={currentTool == tool.name}
+                        active={activeTool == tool.name}
                         onClick={() => dispatch(setTool(tool.name))}
                     >
                         { tool.label }
