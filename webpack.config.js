@@ -10,7 +10,8 @@ export default {
     target: "web",
     output: {
         filename: "printmyosm.js",
-        path: dist
+        path: dist,
+        assetModuleFilename: path => path.filename.replace("frontend/", "")
     },
     module: {
         rules: [
@@ -33,6 +34,11 @@ export default {
                     "sass-loader"
                 ]
             },
+            {
+                test: /\.svg$/,
+                exclude: /node_modules/,
+                type: "asset/resource"
+            }
         ],
     },
     plugins: [
