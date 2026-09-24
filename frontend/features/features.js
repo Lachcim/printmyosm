@@ -2,7 +2,6 @@ import store from "../store/store";
 
 import { updateFeature } from "../store/actions";
 
-import Feature from "./feature";
 import Line from "./line";
 import Point from "./point";
 import Polygon from "./polygon";
@@ -14,11 +13,11 @@ function createFeatureFromType(type) {
     const id = btoa(idArray);
 
     if (type == "printArea")
-        return new PrintArea(id, []);
+        return new PrintArea(id, [], false);
     if (type == "line")
         return new Line(id, []);
     if (type == "polygon")
-        return new Polygon(id, []);
+        return new Polygon(id, [], false);
     if (type == "point")
         return new Point(id, null, "");
 
@@ -30,11 +29,11 @@ function getFeatureFromJson(json) {
     const id = json["id"];
 
     if (type == "printArea")
-        return new PrintArea(id, json["points"]);
+        return new PrintArea(id, json["points"], json["closed"]);
     if (type == "line")
         return new Line(id, json["points"]);
     if (type == "polygon")
-        return new Polygon(id, json["points"]);
+        return new Polygon(id, json["points"], json["closed"]);
     if (type == "point")
         return new Point(id, json["coordinates"], json["label"]);
 
@@ -56,13 +55,13 @@ export function handleMapEvent(event) {
     const feature = getActiveFeature();
     if (!feature) return;
 
-    const eventMap = {
-        "click": Feature.handleClick,
-        "mousemove": Feature.handleMouseMove,
-        "mouseout": Feature.handleMouseOut
+    const eventHandlers = {
+        "click": feature.handleMapClick,
+        "mousemove": feature.handleMapMouseMove,
+        "mouseout": feature.handleMapMouseOut
     };
 
-    const eventHandler = eventMap[event.type];
+    const eventHandler = eventHandlers[event.type];
     if (!eventHandler)
         return;
 

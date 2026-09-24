@@ -1,16 +1,8 @@
-import Feature from "./feature";
+import Polygon from "./polygon";
 
-export default class PrintArea extends Feature {
-    constructor(id, points) {
-        super(id, "printArea");
-        this.points = points;
-    }
-
-    toJson() {
-        return { ...super.toJson(), points: this.points };
-    }
-
-    get complete() {
-        return this.points.length >= 3;
+export default class PrintArea extends Polygon {
+    constructor(id, points, closed) {
+        super(id, points, closed);
+        this.type = "printArea";
     }
 }

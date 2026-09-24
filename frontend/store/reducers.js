@@ -31,7 +31,7 @@ export function reduceSetTileSize(state, action) {
 export function reduceUpdateFeature(state, action) {
     const existingIndex = state.map.features.findIndex(feature => feature.id == action.payload.id);
 
-    if (existingIndex)
+    if (existingIndex != null)
         state.map.features[existingIndex] = action.payload;
     else
         state.map.features.push(action.payload);

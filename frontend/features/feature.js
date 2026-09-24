@@ -12,9 +12,9 @@ export default class Feature {
         throw new Error("Completeness getter not implemented");
     }
 
-    handleClick() { return false; }
-    handleMouseMove() { return false; }
-    handleMouseOut() { return false; }
+    handleMapClick() { return false; }
+    handleMapMouseMove() { return false; }
+    handleMapMouseOut() { return false; }
 
     render() {
         throw new Error("Render not implemented");
