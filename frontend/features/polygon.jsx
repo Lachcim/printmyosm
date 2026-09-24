@@ -79,29 +79,20 @@ export default class Polygon extends Feature {
         delete this.unclosed;
     }
 
-    render() {
-        const getStyle = () => {
-            if (this.type == "printArea") {
-                return {
-                    weight: 2,
-                    color: "#31572C",
-                    fill: false,
-                    lineJoin: "miter"
-                };
-            }
-
-            return {
-                weight: 1,
-                color: "#BF360C",
-                fillOpacity: 0.1
-            };
+    getStyle() {
+        return {
+            weight: 1,
+            color: "#BF360C",
+            fillOpacity: 0.1
         };
+    }
 
+    render() {
         if (this.unclosed) {
             return (
                 <UnclosedPolygonVector
                     points={this.points}
-                    style={getStyle()}
+                    style={this.getStyle()}
                     onClose={() => closePolygon(this.id)}
                     key={this.id}
                 />
@@ -111,7 +102,7 @@ export default class Polygon extends Feature {
         return (
             <PolygonVector
                 points={this.points}
-                style={getStyle()}
+                style={this.getStyle()}
                 key={this.id}
             />
         );

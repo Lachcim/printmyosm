@@ -34,3 +34,7 @@ export function reduceUpdateFeature(state, action) {
     else
         state.map.features.push(action.payload);
 }
+
+export function reducePrintAreaStarted(state, action) {
+    state.map.features = state.map.features.filter(feature => feature.type != "printArea" || feature.id == action.payload);
+}
