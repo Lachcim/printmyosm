@@ -5,22 +5,17 @@ import { MapHoverContext } from "../components/map";
 import { closePolygon } from "./features";
 import Feature from "./feature";
 
-const pathOptions = {
-    weight: 1,
-    color: "#BF360C"
-};
-
-function PolygonVector({ points }) {
+function PolygonVector({ points, style }) {
     return (
         <LeftletPolygon
-            pathOptions={pathOptions}
+            pathOptions={style}
             positions={points}
             interactive={false}
         />
     );
 }
 
-function UnclosedPolygonVector({ points, onClose }) {
+function UnclosedPolygonVector({ points, style, onClose }) {
     const mousePosition = useContext(MapHoverContext);
 
     const getCloseCircle = () => {
@@ -31,7 +26,7 @@ function UnclosedPolygonVector({ points, onClose }) {
             <CircleMarker
                 center={points[0]}
                 radius={5}
-                pathOptions={pathOptions}
+                pathOptions={{ ...style, fill: true }}
                 eventHandlers={{ click: onClose }}
                 bubblingMouseEvents={false}
             />
@@ -42,7 +37,7 @@ function UnclosedPolygonVector({ points, onClose }) {
         <>
             { getCloseCircle() }
             <Polyline
-                pathOptions={pathOptions}
+                pathOptions={style}
                 positions={mousePosition ? [...points, mousePosition] : points}
                 interactive={false}
             />
@@ -85,16 +80,40 @@ export default class Polygon extends Feature {
     }
 
     render() {
+        const getStyle = () => {
+            if (this.type == "printArea") {
+                return {
+                    weight: 2,
+                    color: "#31572C",
+                    fill: false,
+                    lineJoin: "miter"
+                };
+            }
+
+            return {
+                weight: 1,
+                color: "#BF360C",
+                fillOpacity: 0.1
+            };
+        };
+
         if (this.unclosed) {
             return (
                 <UnclosedPolygonVector
                     points={this.points}
+                    style={getStyle()}
                     onClose={() => closePolygon(this.id)}
                     key={this.id}
                 />
             );
         }
 
-        return <PolygonVector points={this.points} key={this.id}/>;
+        return (
+            <PolygonVector
+                points={this.points}
+                style={getStyle()}
+                key={this.id}
+            />
+        );
     }
 }
