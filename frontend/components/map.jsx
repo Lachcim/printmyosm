@@ -4,11 +4,15 @@ import { useSelector, useDispatch } from "react-redux";
 
 import "../style/map";
 
+import { handleMapEvent } from "../features/features";
 import { setZoomLevel, setTileSize } from "../store/actions";
 
 function MapController() {
     const dispatch = useDispatch();
     const map = useMapEvents({
+        click: handleMapEvent,
+        mousemove: handleMapEvent,
+        mouseout: handleMapEvent,
         zoomend: event => dispatch(setZoomLevel(event.target.getZoom()))
     });
 
