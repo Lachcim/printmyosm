@@ -1,10 +1,13 @@
+import React from "react";
+import { Polyline } from "react-leaflet";
+
 import Feature from "./feature";
 
 export default class Polygon extends Feature {
-    constructor(id, points, closed) {
-        super(id, "polygon");
-        this.points = points;
-        this.closed = closed;
+    constructor(json) {
+        super(json);
+        this.points = json["points"] ?? [];
+        this.closed = json["closed"] ?? false;
     }
 
     toJson() {
@@ -25,5 +28,11 @@ export default class Polygon extends Feature {
 
         this.points = [...this.points, [event.latlng.lat, event.latlng.lng]];
         return true;
+    }
+
+    render() {
+        return (
+            <Polyline pathOptions={{ color: "red" }} positions={this.points} key={this.id}/>
+        );
     }
 }

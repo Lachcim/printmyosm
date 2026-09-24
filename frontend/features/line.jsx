@@ -1,9 +1,9 @@
 import Feature from "./feature";
 
 export default class Line extends Feature {
-    constructor(id, points) {
-        super(id, "line");
-        this.points = points;
+    constructor(json) {
+        super(json);
+        this.points = json["points"] ?? [];
     }
 
     toJson() {

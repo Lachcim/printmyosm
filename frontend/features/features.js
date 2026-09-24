@@ -7,37 +7,27 @@ import Point from "./point";
 import Polygon from "./polygon";
 import PrintArea from "./print-area";
 
+export function getFeatureFromJson(json) {
+    const type = json["type"];
+
+    if (type == "printArea")
+        return new PrintArea(json);
+    if (type == "line")
+        return new Line(json);
+    if (type == "polygon")
+        return new Polygon(json);
+    if (type == "point")
+        return new Point(json);
+
+    throw new RangeError(`Invalid feature type ${type}`);
+}
+
 function createFeatureFromType(type) {
     const idArray = new Uint8Array(8);
     crypto.getRandomValues(idArray);
     const id = btoa(idArray);
 
-    if (type == "printArea")
-        return new PrintArea(id, [], false);
-    if (type == "line")
-        return new Line(id, []);
-    if (type == "polygon")
-        return new Polygon(id, [], false);
-    if (type == "point")
-        return new Point(id, null, "");
-
-    throw new RangeError(`Invalid feature type ${type}`);
-}
-
-function getFeatureFromJson(json) {
-    const type = json["type"];
-    const id = json["id"];
-
-    if (type == "printArea")
-        return new PrintArea(id, json["points"], json["closed"]);
-    if (type == "line")
-        return new Line(id, json["points"]);
-    if (type == "polygon")
-        return new Polygon(id, json["points"], json["closed"]);
-    if (type == "point")
-        return new Point(id, json["coordinates"], json["label"]);
-
-    throw new RangeError(`Invalid feature type ${type}`);
+    return getFeatureFromJson({ id, type });
 }
 
 function getActiveFeature() {

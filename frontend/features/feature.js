@@ -1,7 +1,7 @@
 export default class Feature {
-    constructor(id, type) {
-        this.id = id;
-        this.type = type;
+    constructor(json) {
+        this.id = json["id"];
+        this.type = json["type"];
     }
 
     toJson() {

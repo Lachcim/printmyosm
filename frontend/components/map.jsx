@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import "../style/map";
 
-import { handleMapEvent } from "../features/features";
+import { getFeatureFromJson, handleMapEvent } from "../features/features";
 import { setZoomLevel, setTileSize } from "../store/actions";
 
 function MapController() {
@@ -23,6 +23,7 @@ function MapController() {
 
 export default function Map() {
     const tileSize = useSelector(state => state.mapView.tileSize);
+    const features = useSelector(state => state.map.features);
     const dispatch = useDispatch();
 
     const tileLayerEventHandlers = {
@@ -41,6 +42,7 @@ export default function Map() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 eventHandlers={tileLayerEventHandlers}
             />
+            { features.map(feature => getFeatureFromJson(feature).render()) }
         </MapContainer>
     );
 }

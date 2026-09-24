@@ -1,10 +1,10 @@
 import Feature from "./feature";
 
 export default class Point extends Feature {
-    constructor(id, coordinates, label) {
-        super(id, "point");
-        this.coordinates = coordinates;
-        this.label = label;
+    constructor(json) {
+        super(json);
+        this.coordinates = json["coordinates"] ?? [];
+        this.label = json["label"] ?? "";
     }
 
     toJson() {
