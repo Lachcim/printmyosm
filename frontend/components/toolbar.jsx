@@ -1,30 +1,36 @@
 import React from "react";
 
-import Button from "./button";
+import ToolbarNav from "./toolbar-nav";
 
 import "../style/toolbar";
 
-import compass from "../assets/compass.svg";
-import document from "../assets/document.svg";
-import polygon from "../assets/polygon.svg";
-
 export default function Toolbar() {
+    const currentTab = "features";
+
     return (
         <div className="toolbar">
-            <nav>
-                <Button className="toolbar-button">
-                    <img src={polygon}/>
-                    Features
-                </Button>
-                <Button className="toolbar-button">
-                    <img src={compass}/>
-                    Geometry
-                </Button>
-                <Button className="toolbar-button">
-                    <img src={document}/>
-                    Print
-                </Button>
-            </nav>
+            <ToolbarNav/>
+            {
+                currentTab == "features" && (
+                    <div>
+                        <h2>Tools</h2>
+                    </div>
+                )
+            }
+            {
+                currentTab == "geometry" && (
+                    <div>
+                        <h2>geometry</h2>
+                    </div>
+                )
+            }
+            {
+                currentTab == "print" && (
+                    <div>
+                        <h2>print</h2>
+                    </div>
+                )
+            }
         </div>
     );
 }
