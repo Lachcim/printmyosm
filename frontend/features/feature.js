@@ -13,8 +13,6 @@ export default class Feature {
     }
 
     handleMapClick() { return false; }
-    handleMapMouseMove() { return false; }
-    handleMapMouseOut() { return false; }
 
     render() {
         throw new Error("Render not implemented");

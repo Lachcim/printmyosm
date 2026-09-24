@@ -1,6 +1,6 @@
 import store from "../store/store";
 
-import { updateFeature } from "../store/actions";
+import { setTool, updateFeature } from "../store/actions";
 
 import Line from "./line";
 import Point from "./point";
@@ -30,32 +30,27 @@ function createFeatureFromType(type) {
     return getFeatureFromJson({ id, type });
 }
 
-function getActiveFeature() {
+function getFeatureById(id) {
     const state = store.getState();
-    const id = state.toolbar.activeFeature;
-    if (!id) return;
-
     const json = state.map.features.find(feature => feature.id == id);
-    if (!json) return;
+    if (!json) return null;
 
     return getFeatureFromJson(json);
 }
 
-export function handleMapEvent(event) {
+function getActiveFeature() {
+    const state = store.getState();
+    const id = state.toolbar.activeFeature;
+    if (!id) return null;
+
+    return getFeatureById(id);
+}
+
+export function handleMapClick(event) {
     const feature = getActiveFeature();
     if (!feature) return;
 
-    const eventHandlers = {
-        "click": feature.handleMapClick,
-        "mousemove": feature.handleMapMouseMove,
-        "mouseout": feature.handleMapMouseOut
-    };
-
-    const eventHandler = eventHandlers[event.type];
-    if (!eventHandler)
-        return;
-
-    const needsUpdate = eventHandler.call(feature, event);
+    const needsUpdate = feature.handleMapClick(event);
 
     if (needsUpdate)
         store.dispatch(updateFeature(feature.toJson()));
@@ -78,4 +73,14 @@ export function removeIncompleteFeature(stateProxy) {
     stateProxy.map.features = stateProxy.map.features.filter(
         feature => feature.id != id || getFeatureFromJson(feature).complete
     );
+}
+
+export function closePolygon(id) {
+    const polygon = getFeatureById(id);
+    polygon.close();
+
+    if (!polygon.unclosed) {
+        store.dispatch(updateFeature(polygon.toJson()));
+        store.dispatch(setTool(null));
+    }
 }
