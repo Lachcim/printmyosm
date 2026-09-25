@@ -17,6 +17,7 @@ const PointVector = memo(function PointVector({ coordinates, color }) {
             html={html}
             position={coordinates}
             size={[10, 10]}
+            interactive={false}
         />
     );
 });

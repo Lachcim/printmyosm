@@ -4,7 +4,7 @@ import { divIcon } from "leaflet";
 
 import "../style/div-marker";
 
-export default function DivMarker({ position, size, html }) {
+export default function DivMarker({ position, size, html, interactive }) {
     const icon = divIcon({
         html,
         className: "div-marker",
@@ -13,6 +13,6 @@ export default function DivMarker({ position, size, html }) {
     });
 
     return (
-        <Marker position={position} icon={icon}/>
+        <Marker position={position} icon={icon} interactive={interactive}/>
     );
 }
