@@ -2,7 +2,7 @@ import React, { useContext, memo } from "react";
 import { CircleMarker, Polygon as LeftletPolygon, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
-import { closePolygon } from "./features";
+import { completeFeature } from "./features";
 import Feature from "./feature";
 
 const PolygonVector = memo(function PolygonVector({ points, style }) {
@@ -15,11 +15,11 @@ const PolygonVector = memo(function PolygonVector({ points, style }) {
     );
 });
 
-const UnclosedPolygonVector = function UnclosedPolygonVector({ points, style, onClose }) {
+function IncompletePolygonVector({ points, style, onComplete }) {
     const mousePosition = useContext(MapHoverContext);
 
-    const getCloseCircle = () => {
-        if (points.length == 0)
+    const getCompleteCircle = () => {
+        if (points.length < 3)
             return null;
 
         return (
@@ -27,7 +27,7 @@ const UnclosedPolygonVector = function UnclosedPolygonVector({ points, style, on
                 center={points[0]}
                 radius={7}
                 pathOptions={{ ...style, fill: true }}
-                eventHandlers={{ click: onClose }}
+                eventHandlers={{ click: onComplete }}
                 bubblingMouseEvents={false}
             />
         );
@@ -35,7 +35,7 @@ const UnclosedPolygonVector = function UnclosedPolygonVector({ points, style, on
 
     return (
         <>
-            { getCloseCircle() }
+            { getCompleteCircle() }
             <Polyline
                 pathOptions={style}
                 positions={mousePosition ? [...points, mousePosition] : points}
@@ -43,40 +43,37 @@ const UnclosedPolygonVector = function UnclosedPolygonVector({ points, style, on
             />
         </>
     );
-};
+}
 
 export default class Polygon extends Feature {
     constructor(json) {
         super(json);
         this.points = json["points"] ?? [];
-        this.unclosed = json["unclosed"] || this.points.length < 3;
+        this.incomplete = json["incomplete"] || this.points.length < 3;
     }
 
     toJson() {
         return {
             ...super.toJson(),
             points: this.points,
-            unclosed: this.unclosed
+            incomplete: this.incomplete
         };
     }
 
-    get complete() {
-        return !this.unclosed;
+    complete() {
+        delete this.incomplete;
+    }
+
+    isComplete() {
+        return !this.incomplete;
     }
 
     handleMapClick(event) {
-        if (!this.unclosed)
+        if (!this.incomplete)
             return false;
 
         this.points = [...this.points, [event.latlng.lat, event.latlng.lng]];
         return true;
-    }
-
-    close() {
-        if (this.points.length < 3)
-            return;
-
-        delete this.unclosed;
     }
 
     static style = {
@@ -90,12 +87,12 @@ export default class Polygon extends Feature {
     }
 
     render() {
-        if (this.unclosed) {
+        if (this.incomplete) {
             return (
-                <UnclosedPolygonVector
+                <IncompletePolygonVector
                     points={this.points}
                     style={this.getStyle()}
-                    onClose={() => closePolygon(this.id)}
+                    onComplete={() => completeFeature(this.id)}
                     key={this.id}
                 />
             );

@@ -2,7 +2,7 @@ import React, { useContext, memo } from "react";
 import { CircleMarker, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
-import { finishLine } from "./features";
+import { completeFeature } from "./features";
 import Feature from "./feature";
 
 const PolylineVector = memo(function PolylineVector({ points, style }) {
@@ -15,10 +15,10 @@ const PolylineVector = memo(function PolylineVector({ points, style }) {
     );
 });
 
-function UnfinshedPolylineVector({ points, style, onFinish }) {
+function IncompletePolylineVector({ points, style, onComplete }) {
     const mousePosition = useContext(MapHoverContext);
 
-    const getFinishCircle = () => {
+    const getCompleteCircle = () => {
         if (points.length < 2)
             return null;
 
@@ -27,7 +27,7 @@ function UnfinshedPolylineVector({ points, style, onFinish }) {
                 center={points[points.length - 1]}
                 radius={7}
                 pathOptions={{ ...style, dashArray: null }}
-                eventHandlers={{ click: onFinish }}
+                eventHandlers={{ click: onComplete }}
                 bubblingMouseEvents={false}
             />
         );
@@ -35,7 +35,7 @@ function UnfinshedPolylineVector({ points, style, onFinish }) {
 
     return (
         <>
-            { getFinishCircle() }
+            { getCompleteCircle() }
             <Polyline
                 pathOptions={style}
                 positions={mousePosition ? [...points, mousePosition] : points}
@@ -49,31 +49,31 @@ export default class Line extends Feature {
     constructor(json) {
         super(json);
         this.points = json["points"] ?? [];
-        this.unfinished = json["unfinished"] || this.points.length < 2;
+        this.incomplete = json["incomplete"] || this.points.length < 2;
     }
 
     toJson() {
         return {
             ...super.toJson(),
             points: this.points,
-            unfinished: this.unfinished
+            incomplete: this.incomplete
         };
     }
 
-    get complete() {
-        return !this.unfinished;
+    complete() {
+        delete this.incomplete;
+    }
+
+    isComplete() {
+        return !this.incomplete;
     }
 
     handleMapClick(event) {
-        if (!this.unfinished)
+        if (!this.incomplete)
             return false;
 
         this.points = [...this.points, [event.latlng.lat, event.latlng.lng]];
         return true;
-    }
-
-    finish() {
-        delete this.unfinished;
     }
 
     static style = {
@@ -87,12 +87,12 @@ export default class Line extends Feature {
     }
 
     render() {
-        if (this.unfinished) {
+        if (this.incomplete) {
             return (
-                <UnfinshedPolylineVector
+                <IncompletePolylineVector
                     points={this.points}
                     style={this.getStyle()}
-                    onFinish={() => finishLine(this.id)}
+                    onComplete={() => completeFeature(this.id)}
                     key={this.id}
                 />
             );

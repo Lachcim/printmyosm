@@ -8,7 +8,9 @@ export default class Feature {
         return { id: this.id, type: this.type };
     }
 
-    get complete() {
+    complete() {}
+
+    isComplete() {
         throw new Error("Completeness getter not implemented");
     }
 

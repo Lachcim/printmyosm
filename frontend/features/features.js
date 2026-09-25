@@ -75,26 +75,16 @@ export function removeIncompleteFeature(stateProxy) {
     }
 
     const resolvedFeature = getFeatureFromJson(json);
-    if (resolvedFeature.complete) return;
+    if (resolvedFeature.isComplete()) return;
 
     stateProxy.map.features = stateProxy.map.features.filter(feature => feature.id != id);
     stateProxy.toolbar.activeFeature = null;
 }
 
-export function closePolygon(id) {
-    const polygon = getFeatureById(id);
-    polygon.close();
+export function completeFeature(id) {
+    const feature = getFeatureById(id);
+    feature.complete();
 
-    if (!polygon.unclosed) {
-        store.dispatch(updateFeature(polygon.toJson()));
-        store.dispatch(setTool(null));
-    }
-}
-
-export function finishLine(id) {
-    const line = getFeatureById(id);
-    line.finish();
-
-    store.dispatch(updateFeature(line.toJson()));
+    store.dispatch(updateFeature(feature.toJson()));
     store.dispatch(setTool(null));
 }
