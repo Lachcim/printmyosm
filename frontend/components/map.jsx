@@ -32,7 +32,7 @@ function MapController({ children }) {
 }
 
 const MapFeatures = memo(function MapFeatures() {
-    const features = useSelector(state => state.map.features);
+    const features = useSelector(state => state.map?.features) ?? [];
     return features.map(feature => getFeatureFromJson(feature).render());
 });
 
@@ -50,7 +50,7 @@ export default function Map() {
     };
 
     return (
-        <MapContainer className="map" center={[0, 0]} zoom={4}>
+        <MapContainer className="map" center={[49.1925, 16.608333]} zoom={5}>
             <TileLayer
                 url="/tile/{z}/{x}/{y}"
                 eventHandlers={tileLayerEventHandlers}

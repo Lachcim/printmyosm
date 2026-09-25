@@ -2,7 +2,7 @@ import React from "react";
 import { Provider as StoreProvider } from "react-redux";
 
 import Header from "./components/header";
-import Map from "./components/map";
+import MapWelcome from "./components/map-welcome";
 import Toolbar from "./components/toolbar";
 
 import "./style/app";
@@ -14,7 +14,7 @@ export default function App() {
         <StoreProvider store={store}>
             <Header/>
             <div className="map-toolbar">
-                <Map/>
+                <MapWelcome/>
                 <Toolbar/>
             </div>
         </StoreProvider>

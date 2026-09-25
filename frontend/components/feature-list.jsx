@@ -28,7 +28,7 @@ function FeatureListItem({ feature }) {
 }
 
 export default function FeatureList() {
-    const rawFeatures = useSelector(state => state.map.features);
+    const rawFeatures = useSelector(state => state.map?.features) ?? [];
     const features = rawFeatures.map(getFeatureFromJson).filter(feature => feature.isComplete());
 
     const rawList = useRef();

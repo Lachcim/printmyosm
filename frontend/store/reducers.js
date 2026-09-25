@@ -1,4 +1,15 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { createFeature, removeIncompleteFeature } from "../features/features";
+
+export function reduceCreateNewMap(state) {
+    state.map = {
+        id: uuidv4(),
+        name: null,
+        features: [],
+        geometry: null
+    };
+}
 
 export function reduceSetToolbarTab(state, action) {
     state.toolbar.tab = action.payload;

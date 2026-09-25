@@ -30,7 +30,7 @@ function createFeatureFromType(type) {
 
 function getFeatureById(id) {
     const state = store.getState();
-    const json = state.map.features.find(feature => feature.id == id);
+    const json = state.map.features?.find(feature => feature.id == id);
     if (!json) return null;
 
     return getFeatureFromJson(json);
