@@ -42,17 +42,17 @@ export default function Map() {
 
     const tileLayerEventHandlers = {
         tileload: event => {
-            const { x, y } = event.target.getTileSize();
-            if (tileSize?.x != x || tileSize?.y != y)
-                dispatch(setTileSize({ x, y }));
+            const width = event.tile.naturalWidth;
+            const height = event.tile.naturalHeight;
+            if (tileSize?.width != width || tileSize?.height != height)
+                dispatch(setTileSize({ width, height }));
         }
     };
 
     return (
         <MapContainer className="map" center={[0, 0]} zoom={4}>
             <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="/tile/{z}/{x}/{y}"
                 eventHandlers={tileLayerEventHandlers}
             />
             <MapController>
