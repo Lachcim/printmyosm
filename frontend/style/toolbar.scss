@@ -1,6 +1,7 @@
 .toolbar {
     width: 24rem;
     margin-left: 1rem;
+    position: relative;
 
     h2 {
         font-size: 16pt;
@@ -8,5 +9,15 @@
         &:first-child {
             margin-top: 0;
         }
+    }
+
+    .disabled-overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+
+        background-color: rgba(255, 255, 255, 0.5);
     }
 }

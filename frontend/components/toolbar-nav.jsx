@@ -11,7 +11,7 @@ import polygon from "../assets/polygon.svg";
 
 import { setToolbarTab } from "../store/actions";
 
-export default function Toolbar() {
+export default function ToolbarNav({ disabled }) {
     const currentTab = useSelector(state => state.toolbar.tab);
     const dispatch = useDispatch();
 
@@ -29,7 +29,7 @@ export default function Toolbar() {
                         key={tab.name}
                         className="toolbar-button"
                         active={currentTab == tab.name}
-                        onClick={() => dispatch(setToolbarTab(tab.name))}
+                        onClick={() => { if (!disabled) dispatch(setToolbarTab(tab.name)); }}
                     >
                         <img src={tab.icon}/>
                         { tab.label }

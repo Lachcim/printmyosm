@@ -7,7 +7,7 @@ import "../style/tools";
 
 import { setTool } from "../store/actions";
 
-export default function Tools() {
+export default function Tools({ disabled }) {
     const activeTool = useSelector(state => state.toolbar.tool);
     const dispatch = useDispatch();
 
@@ -28,7 +28,7 @@ export default function Tools() {
                         secondary
                         className="tool-button"
                         active={activeTool == tool.name}
-                        onClick={() => dispatch(setTool(tool.name))}
+                        onClick={() => { if (!disabled) dispatch(setTool(tool.name)); }}
                     >
                         { tool.label }
                     </Button>

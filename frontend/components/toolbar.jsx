@@ -9,15 +9,18 @@ import "../style/toolbar";
 
 export default function Toolbar() {
     const tab = useSelector(state => state.toolbar.tab);
+    const map = useSelector(state => state.map);
+
+    const disabled = map == null;
 
     return (
         <div className="toolbar">
-            <ToolbarNav/>
+            <ToolbarNav disabled={disabled}/>
             {
                 tab == "features" && (
                     <div>
                         <h2>Create feature</h2>
-                        <Tools/>
+                        <Tools disabled={disabled}/>
                         <h2>Map features</h2>
                         <FeatureList/>
                     </div>
@@ -37,6 +40,7 @@ export default function Toolbar() {
                     </div>
                 )
             }
+            { disabled && <div className="disabled-overlay"/> }
         </div>
     );
 }
