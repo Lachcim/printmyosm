@@ -1,14 +1,29 @@
 import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
+import Button from "./button";
 import { getFeatureFromJson } from "../features/features";
+import { removeFeature } from "../store/actions";
 
 import "../style/button";
 import "../style/feature-list";
 
+import remove from "../assets/remove.svg";
+
 function FeatureListItem({ feature }) {
+    const dispatch = useDispatch();
+
+    const handleRemove = () => {
+        dispatch(removeFeature(feature.id));
+    };
+
     return (
-        <li className="button secondary">{ feature.getLabel() }</li>
+        <li className="button secondary">
+            <span>{ feature.getLabel() }</span>
+            <Button unobtrusive onClick={handleRemove}>
+                <img src={remove} alt="Remove" className="remove"/>
+            </Button>
+        </li>
     );
 }
 

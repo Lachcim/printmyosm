@@ -8,12 +8,16 @@
     overflow: auto;
 
     & > li {
-        display: block;
+        display: flex;
         font-size: 10pt;
 
         &:nth-child(odd) {
             background-color: #FAFAFA;
         }
+
+        & > span { flex: 1; }
+        & .remove { height: 0.75em; }
+        &:not(:hover) .remove { display: none; }
     }
 
     &.empty {

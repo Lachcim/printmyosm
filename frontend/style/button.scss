@@ -24,4 +24,11 @@
             background-color: #BDBDBD;
         }
     }
+
+    &.unobtrusive {
+        color: inherit;
+        background: none;
+
+        padding: 0;
+    }
 }
