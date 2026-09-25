@@ -60,6 +60,10 @@ export default class Line extends Feature {
         };
     }
 
+    get defaultLabel() {
+        return "Line";
+    }
+
     complete() {
         delete this.incomplete;
     }

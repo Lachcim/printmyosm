@@ -50,6 +50,10 @@ export default class Point extends Feature {
         };
     }
 
+    get defaultLabel() {
+        return "Point";
+    }
+
     complete(coordinates) {
         this.coordinates = coordinates;
     }

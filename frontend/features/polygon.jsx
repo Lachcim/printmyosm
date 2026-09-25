@@ -60,6 +60,10 @@ export default class Polygon extends Feature {
         };
     }
 
+    get defaultLabel() {
+        return "Polygon";
+    }
+
     complete() {
         delete this.incomplete;
     }

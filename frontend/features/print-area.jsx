@@ -9,6 +9,10 @@ export default class PrintArea extends Polygon {
         this.type = "printArea";
     }
 
+    get defaultLabel() {
+        return "Print area";
+    }
+
     handleMapClick(event) {
         const pointAdded = super.handleMapClick(event);
 

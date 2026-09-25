@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
+import FeatureList from "./feature-list";
 import ToolbarNav from "./toolbar-nav";
 import Tools from "./tools";
 
@@ -15,8 +16,10 @@ export default function Toolbar() {
             {
                 tab == "features" && (
                     <div>
-                        <h2>Tools</h2>
+                        <h2>Create feature</h2>
                         <Tools/>
+                        <h2>Map features</h2>
+                        <FeatureList/>
                     </div>
                 )
             }
