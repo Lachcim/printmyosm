@@ -1,15 +1,29 @@
 import express from "express";
 import path from "node:path";
 import { createWriteStream, existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { finished } from "node:stream/promises";
 
 const app = express();
 
 app.use(express.static("dist"));
+app.use(express.json());
 
 app.listen(8080, () => {
     console.log("Example app listening on port 8080");
+});
+
+app.get("/maps", async (req, res) => {
+    const mapsFile = path.join(import.meta.dirname, "..", "maps.json");
+
+    if (!existsSync(mapsFile)) {
+        res.json([]);
+        return;
+    }
+
+    const rawMaps = await readFile(mapsFile);
+    res.json(JSON.parse(rawMaps).map(map => ({ id: map.id, name: map.name })));
 });
 
 app.get("/tile/:zoom/:x/:y", async (req, res) => {
