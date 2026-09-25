@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import store from "../store/store";
 
 import { setTool, updateFeature } from "../store/actions";
@@ -23,11 +25,7 @@ export function getFeatureFromJson(json) {
 }
 
 function createFeatureFromType(type) {
-    const idArray = new Uint8Array(8);
-    crypto.getRandomValues(idArray);
-    const id = btoa(idArray);
-
-    return getFeatureFromJson({ id, type });
+    return getFeatureFromJson({ id: uuidv4(), type });
 }
 
 function getFeatureById(id) {
