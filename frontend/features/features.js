@@ -81,9 +81,9 @@ export function removeIncompleteFeature(stateProxy) {
     stateProxy.toolbar.activeFeature = null;
 }
 
-export function completeFeature(id) {
+export function completeFeature(id, ...args) {
     const feature = getFeatureById(id);
-    feature.complete();
+    feature.complete(...args);
 
     store.dispatch(updateFeature(feature.toJson()));
     store.dispatch(setTool(null));

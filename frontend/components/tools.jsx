@@ -16,7 +16,7 @@ export default function Tools() {
         { name: "printArea", label: "Print area" },
         { name: "line", label: "Line" },
         { name: "polygon", label: "Polygon" },
-        { name: "point", label: "Labelled point" },
+        { name: "point", label: "Point" },
     ];
 
     return (
