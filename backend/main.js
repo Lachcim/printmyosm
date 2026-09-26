@@ -51,6 +51,14 @@ app.put("/maps/:id", async (req, res) => {
     res.send();
 });
 
+app.delete("/maps/:id", async (req, res) => {
+    let maps = await getMaps();
+    maps = maps.filter(map => map.id != req.params.id);
+
+    saveMaps(maps);
+    res.send();
+});
+
 app.get("/tile/:zoom/:x/:y", async (req, res) => {
     const { zoom, x, y } = req.params;
     const filePath = path.join(import.meta.dirname, "..", "tiles", `${zoom}-${x}-${y}.webp`);

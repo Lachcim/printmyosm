@@ -34,11 +34,16 @@ export default function MapWelcome() {
 
         dispatch(loadMap(mapData));
     };
+    const deleteMap = id => {
+        fetch(`/maps/${id}`, { method: "delete" });
+        setMapList(maps => maps.filter(map => map.id != id));
+    };
 
     const listItems = mapList?.map(map => ({
-        label: map.name,
+        label: map.name ?? "Untitled map",
         key: map.id,
-        onClick: () => selectMap(map.id)
+        onClick: () => selectMap(map.id),
+        onRemove: () => deleteMap(map.id)
     }));
 
     return (
