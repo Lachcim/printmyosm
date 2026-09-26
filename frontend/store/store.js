@@ -31,3 +31,20 @@ const store = configureStore({
 });
 
 export default store;
+
+let prevMap = null;
+store.subscribe(() => {
+    const state = store.getState();
+
+    if (state.map != prevMap && prevMap != null) {
+        fetch(`/maps/${state.map.id}`, {
+            method: "put",
+            body: JSON.stringify(state.map),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }
+
+    prevMap = state.map;
+});

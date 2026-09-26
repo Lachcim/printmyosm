@@ -1,7 +1,7 @@
 import express from "express";
 import path from "node:path";
 import { createWriteStream, existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { finished } from "node:stream/promises";
 
@@ -14,15 +14,19 @@ app.listen(8080, () => {
     console.log("PrintMyOSM listening at http://localhost:8080");
 });
 
-async function getMaps() {
-    const mapsFile = path.join(import.meta.dirname, "..", "maps.json");
+const mapsFile = path.join(import.meta.dirname, "..", "maps.json");
 
+async function getMaps() {
     if (!existsSync(mapsFile)) {
         return [];
     }
 
     const rawMaps = await readFile(mapsFile);
     return JSON.parse(rawMaps);
+}
+
+async function saveMaps(maps) {
+    await writeFile(mapsFile, JSON.stringify(maps));
 }
 
 app.get("/maps", async (req, res) => {
@@ -32,7 +36,19 @@ app.get("/maps", async (req, res) => {
 
 app.get("/maps/:id", async (req, res) => {
     const maps = await getMaps();
-    res.json(maps.find(map => map.id = req.params.id));
+    res.json(maps.find(map => map.id == req.params.id));
+});
+
+app.put("/maps/:id", async (req, res) => {
+    let maps = await getMaps();
+    maps = maps.filter(map => map.id != req.params.id);
+
+    if (req.body.features.length > 0 || req.body.geometry != null) {
+        maps = [req.body, ...maps];
+    }
+
+    saveMaps(maps);
+    res.send();
 });
 
 app.get("/tile/:zoom/:x/:y", async (req, res) => {
