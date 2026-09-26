@@ -33,7 +33,14 @@ function MapController({ children }) {
 
 const MapFeatures = memo(function MapFeatures() {
     const features = useSelector(state => state.map?.features) ?? [];
-    return features.map(feature => getFeatureFromJson(feature).render());
+    const activeFeature = useSelector(state => state.toolbar.activeFeature);
+
+    return (
+        <>
+            { features.map(feature => getFeatureFromJson(feature).render()) }
+            { activeFeature instanceof Object && getFeatureFromJson(activeFeature).render() }
+        </>
+    );
 });
 
 export default function Map() {

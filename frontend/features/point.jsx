@@ -1,9 +1,11 @@
 import React, { useContext, memo } from "react";
 
 import { MapHoverContext } from "../components/map";
-import { completeFeature } from "./features";
 import DivMarker from "./div-marker";
 import Feature from "./feature";
+
+import store from "../store/store";
+import { completeFeature, updateFeature } from "../store/actions";
 
 const PointVector = memo(function PointVector({ coordinates, color }) {
     const html = `
@@ -55,20 +57,13 @@ export default class Point extends Feature {
         return "Point";
     }
 
-    complete(coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    isComplete() {
-        return this.coordinates != null;
-    }
-
     handleMapClick(event) {
-        if (this.coordinates != null)
-            return false;
+        if (!this.incomplete)
+            return;
 
-        completeFeature(this.id, [event.latlng.lat, event.latlng.lng]);
-        return false;
+        this.coordinates = [event.latlng.lat, event.latlng.lng];
+        store.dispatch(updateFeature(this.toJson()));
+        store.dispatch(completeFeature());
     }
 
     getColor() {
@@ -76,7 +71,7 @@ export default class Point extends Feature {
     }
 
     render() {
-        if (this.coordinates == null) {
+        if (this.incomplete) {
             return (
                 <IncompletePointVector
                     color={this.getColor()}

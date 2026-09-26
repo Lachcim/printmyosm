@@ -1,8 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
-
 import store from "../store/store";
-
-import { setTool, updateFeature } from "../store/actions";
 
 import Line from "./line";
 import Point from "./point";
@@ -24,10 +20,6 @@ export function getFeatureFromJson(json) {
     throw new RangeError(`Invalid feature type ${type}`);
 }
 
-function createFeatureFromType(type) {
-    return getFeatureFromJson({ id: uuidv4(), type });
-}
-
 function getFeatureById(id) {
     const state = store.getState();
     const json = state.map.features?.find(feature => feature.id == id);
@@ -38,51 +30,19 @@ function getFeatureById(id) {
 
 function getActiveFeature() {
     const state = store.getState();
-    const id = state.toolbar.activeFeature;
-    if (!id) return null;
+    const feature = state.toolbar.activeFeature;
 
-    return getFeatureById(id);
+    if (!feature) return null;
+
+    if (typeof feature == "string")
+        return getFeatureById(feature);
+
+    return getFeatureFromJson(feature);
 }
 
 export function handleMapClick(event) {
     const feature = getActiveFeature();
     if (!feature) return;
 
-    const needsUpdate = feature.handleMapClick(event);
-
-    if (needsUpdate)
-        store.dispatch(updateFeature(feature.toJson()));
-}
-
-export function createFeature(stateProxy, type) {
-    const feature = createFeatureFromType(type);
-
-    stateProxy.toolbar.activeFeature = feature.id;
-    stateProxy.map.features.push(feature.toJson());
-    return feature.id;
-}
-
-export function removeIncompleteFeature(stateProxy) {
-    const id = stateProxy.toolbar.activeFeature;
-    if (!id) return;
-
-    const json = stateProxy.map.features.find(feature => feature.id == id);
-    if (!json) {
-        stateProxy.toolbar.activeFeature = null;
-        return;
-    }
-
-    const resolvedFeature = getFeatureFromJson(json);
-    if (resolvedFeature.isComplete()) return;
-
-    stateProxy.map.features = stateProxy.map.features.filter(feature => feature.id != id);
-    stateProxy.toolbar.activeFeature = null;
-}
-
-export function completeFeature(id, ...args) {
-    const feature = getFeatureById(id);
-    feature.complete(...args);
-
-    store.dispatch(updateFeature(feature.toJson()));
-    store.dispatch(setTool(null));
+    feature.handleMapClick(event);
 }

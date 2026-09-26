@@ -1,9 +1,12 @@
 import React, { useContext, memo } from "react";
+import { useDispatch } from "react-redux";
 import { CircleMarker, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
-import { completeFeature } from "./features";
 import Feature from "./feature";
+
+import store from "../store/store";
+import { completeFeature, updateFeature } from "../store/actions";
 
 const PolylineVector = memo(function PolylineVector({ points, style }) {
     return (
@@ -15,8 +18,9 @@ const PolylineVector = memo(function PolylineVector({ points, style }) {
     );
 });
 
-function IncompletePolylineVector({ points, style, onComplete }) {
+function IncompletePolylineVector({ points, style }) {
     const mousePosition = useContext(MapHoverContext);
+    const dispatch = useDispatch();
 
     const getCompleteCircle = () => {
         if (points.length < 2)
@@ -27,7 +31,7 @@ function IncompletePolylineVector({ points, style, onComplete }) {
                 center={points[points.length - 1]}
                 radius={7}
                 pathOptions={{ ...style, dashArray: null }}
-                eventHandlers={{ click: onComplete }}
+                eventHandlers={{ click: () => dispatch(completeFeature()) }}
                 bubblingMouseEvents={false}
             />
         );
@@ -49,14 +53,12 @@ export default class Line extends Feature {
     constructor(json) {
         super(json);
         this.points = json["points"] ?? [];
-        this.incomplete = json["incomplete"] || this.points.length < 2;
     }
 
     toJson() {
         return {
             ...super.toJson(),
             points: this.points,
-            incomplete: this.incomplete
         };
     }
 
@@ -64,20 +66,12 @@ export default class Line extends Feature {
         return "Line";
     }
 
-    complete() {
-        delete this.incomplete;
-    }
-
-    isComplete() {
-        return !this.incomplete;
-    }
-
     handleMapClick(event) {
         if (!this.incomplete)
-            return false;
+            return;
 
         this.points = [...this.points, [event.latlng.lat, event.latlng.lng]];
-        return true;
+        store.dispatch(updateFeature(this.toJson()));
     }
 
     static style = {
@@ -96,7 +90,6 @@ export default class Line extends Feature {
                 <IncompletePolylineVector
                     points={this.points}
                     style={this.getStyle()}
-                    onComplete={() => completeFeature(this.id)}
                     key={this.id}
                 />
             );

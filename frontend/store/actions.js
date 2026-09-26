@@ -6,6 +6,7 @@ export const setToolbarTab = createAction("setToolbarTab");
 export const setTool = createAction("setTool");
 export const setZoomLevel = createAction("setZoomLevel");
 export const setTileSize = createAction("setTileSize");
+export const completeFeature = createAction("completeFeature");
 export const updateFeature = createAction("updateFeature");
 export const printAreaStarted = createAction("printAreaStarted");
 export const removeFeature = createAction("removeFeature");

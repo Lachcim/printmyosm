@@ -24,6 +24,7 @@ const store = configureStore({
         builder.addCase(actions.setTool, reducers.reduceSetTool);
         builder.addCase(actions.setZoomLevel, reducers.reduceSetZoomLevel);
         builder.addCase(actions.setTileSize, reducers.reduceSetTileSize);
+        builder.addCase(actions.completeFeature, reducers.reduceCompleteFeature);
         builder.addCase(actions.updateFeature, reducers.reduceUpdateFeature);
         builder.addCase(actions.printAreaStarted, reducers.reducePrintAreaStarted);
         builder.addCase(actions.removeFeature, reducers.reduceRemoveFeature);

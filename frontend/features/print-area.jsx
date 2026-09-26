@@ -14,13 +14,12 @@ export default class PrintArea extends Polygon {
     }
 
     handleMapClick(event) {
-        const pointAdded = super.handleMapClick(event);
+        const startPoints = this.points.length;
+        super.handleMapClick(event);
 
-        if (pointAdded && this.points.length == 1) {
+        if (this.points.length == 1 && startPoints == 0) {
             store.dispatch(printAreaStarted(this.id));
         }
-
-        return pointAdded;
     }
 
     static style = {

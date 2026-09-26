@@ -8,7 +8,7 @@ import { removeFeature } from "../store/actions";
 export default function FeatureList() {
     const dispatch = useDispatch();
     const rawFeatures = useSelector(state => state.map?.features) ?? [];
-    const features = rawFeatures.map(getFeatureFromJson).filter(feature => feature.isComplete());
+    const features = rawFeatures.map(getFeatureFromJson);
 
     const items = features.map(feature => ({
         label: feature.getLabel(),

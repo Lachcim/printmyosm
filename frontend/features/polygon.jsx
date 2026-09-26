@@ -1,9 +1,12 @@
 import React, { useContext, memo } from "react";
+import { useDispatch } from "react-redux";
 import { CircleMarker, Polygon as LeftletPolygon, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
-import { completeFeature } from "./features";
 import Feature from "./feature";
+
+import store from "../store/store";
+import { completeFeature, updateFeature } from "../store/actions";
 
 const PolygonVector = memo(function PolygonVector({ points, style }) {
     return (
@@ -15,8 +18,9 @@ const PolygonVector = memo(function PolygonVector({ points, style }) {
     );
 });
 
-function IncompletePolygonVector({ points, style, onComplete }) {
+function IncompletePolygonVector({ points, style }) {
     const mousePosition = useContext(MapHoverContext);
+    const dispatch = useDispatch();
 
     const getCompleteCircle = () => {
         if (points.length < 3)
@@ -27,7 +31,7 @@ function IncompletePolygonVector({ points, style, onComplete }) {
                 center={points[0]}
                 radius={7}
                 pathOptions={{ ...style, fill: true }}
-                eventHandlers={{ click: onComplete }}
+                eventHandlers={{ click: () => dispatch(completeFeature()) }}
                 bubblingMouseEvents={false}
             />
         );
@@ -49,14 +53,12 @@ export default class Polygon extends Feature {
     constructor(json) {
         super(json);
         this.points = json["points"] ?? [];
-        this.incomplete = json["incomplete"] || this.points.length < 3;
     }
 
     toJson() {
         return {
             ...super.toJson(),
             points: this.points,
-            incomplete: this.incomplete
         };
     }
 
@@ -64,20 +66,12 @@ export default class Polygon extends Feature {
         return "Polygon";
     }
 
-    complete() {
-        delete this.incomplete;
-    }
-
-    isComplete() {
-        return !this.incomplete;
-    }
-
     handleMapClick(event) {
         if (!this.incomplete)
-            return false;
+            return;
 
         this.points = [...this.points, [event.latlng.lat, event.latlng.lng]];
-        return true;
+        store.dispatch(updateFeature(this.toJson()));
     }
 
     static style = {
@@ -96,7 +90,6 @@ export default class Polygon extends Feature {
                 <IncompletePolygonVector
                     points={this.points}
                     style={this.getStyle()}
-                    onComplete={() => completeFeature(this.id)}
                     key={this.id}
                 />
             );
