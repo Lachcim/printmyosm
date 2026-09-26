@@ -37,7 +37,7 @@ function ListItem({ children, onClick, onRemove }) {
     );
 }
 
-export default function List({ items, emptyText }) {
+export default function List({ items, emptyText, mini }) {
     const rawList = useRef();
     const previousItemCount = useRef(items.length);
 
@@ -54,7 +54,7 @@ export default function List({ items, emptyText }) {
     }, [items.length]);
 
     return (
-        <ul className={`list ${items.length == 0 && "empty"}`} ref={rawList}>
+        <ul className={`list ${items.length == 0 && "empty"} ${mini && "mini"}`} ref={rawList}>
             {
                 items.map(item => (
                     <ListItem key={item.key} onClick={item.onClick} onRemove={item.onRemove}>

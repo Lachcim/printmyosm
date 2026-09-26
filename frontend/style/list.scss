@@ -2,18 +2,10 @@
     display: block;
     padding: 0;
     margin: 1rem 0;
-    border: 1px solid #E0E0E0;
-
-    height: 10rem;
-    overflow: auto;
 
     & > li {
         display: flex;
-        font-size: 10pt;
-
-        &:nth-child(odd) {
-            background-color: #FAFAFA;
-        }
+        margin-bottom: 0.5rem;
 
         & > span { flex: 1; }
         & .remove { height: 0.75em; visibility: hidden; }
@@ -32,6 +24,21 @@
 
         p {
             margin: 1rem;
+        }
+    }
+
+    &.mini {
+        height: 10rem;
+        overflow: auto;
+        border: 1px solid #E0E0E0;
+
+        & > li {
+            font-size: 10pt;
+            margin-bottom: 0;
+
+            &:nth-child(odd) {
+                background-color: #FAFAFA;
+            }
         }
     }
 }

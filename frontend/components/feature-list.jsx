@@ -17,6 +17,6 @@ export default function FeatureList() {
     }));
 
     return (
-        <List items={items} emptyText={"There are no features yet."}/>
+        <List mini items={items} emptyText={"There are no features yet."}/>
     );
 }
