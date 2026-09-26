@@ -11,19 +11,28 @@ app.use(express.static("dist"));
 app.use(express.json());
 
 app.listen(8080, () => {
-    console.log("Example app listening on port 8080");
+    console.log("PrintMyOSM listening at http://localhost:8080");
 });
 
-app.get("/maps", async (req, res) => {
+async function getMaps() {
     const mapsFile = path.join(import.meta.dirname, "..", "maps.json");
 
     if (!existsSync(mapsFile)) {
-        res.json([]);
-        return;
+        return [];
     }
 
     const rawMaps = await readFile(mapsFile);
-    res.json(JSON.parse(rawMaps).map(map => ({ id: map.id, name: map.name })));
+    return JSON.parse(rawMaps);
+}
+
+app.get("/maps", async (req, res) => {
+    const maps = await getMaps();
+    res.json(maps.map(map => ({ id: map.id, name: map.name })));
+});
+
+app.get("/maps/:id", async (req, res) => {
+    const maps = await getMaps();
+    res.json(maps.find(map => map.id = req.params.id));
 });
 
 app.get("/tile/:zoom/:x/:y", async (req, res) => {

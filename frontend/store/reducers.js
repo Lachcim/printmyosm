@@ -11,6 +11,10 @@ export function reduceCreateNewMap(state) {
     };
 }
 
+export function reduceLoadMap(state, action) {
+    state.map = action.payload;
+}
+
 export function reduceSetToolbarTab(state, action) {
     state.toolbar.tab = action.payload;
 

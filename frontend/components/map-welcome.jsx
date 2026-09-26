@@ -7,7 +7,7 @@ import Map from "./map";
 
 import "../style/map-welcome";
 
-import { createNewMap } from "../store/actions";
+import { createNewMap, loadMap } from "../store/actions";
 
 export default function MapWelcome() {
     const [mapList, setMapList] = useState(null);
@@ -28,9 +28,17 @@ export default function MapWelcome() {
         return <Map/>;
     }
 
+    const selectMap = async id => {
+        const response = await fetch(`/maps/${id}`);
+        const mapData = await response.json();
+
+        dispatch(loadMap(mapData));
+    };
+
     const listItems = mapList?.map(map => ({
         label: map.name,
-        key: map.id
+        key: map.id,
+        onClick: () => selectMap(map.id)
     }));
 
     return (
