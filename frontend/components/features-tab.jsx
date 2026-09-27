@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import FeatureEditor from "./feature-editor";
 import FeatureList from "./feature-list";
 import ToolbarTab from "./toolbar-tab";
 import Tools from "./tools";
@@ -36,6 +37,7 @@ export default function FeaturesTab({ disabled }) {
             <Tools disabled={disabled}/>
             <h2>Map features</h2>
             <FeatureList/>
+            <FeatureEditor disabled={disabled}/>
         </ToolbarTab>
     );
 }

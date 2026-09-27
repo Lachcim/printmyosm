@@ -14,7 +14,7 @@ export default function FeatureList() {
     const activeFeatureId = activeFeature instanceof Object ? activeFeature.id : activeFeature;
 
     const items = features.map(feature => ({
-        label: feature.getLabel(),
+        label: feature.label ?? feature.defaultLabel,
         key: feature.id,
         onClick: () => dispatch(focusFeature(feature.id)),
         onRemove: () => dispatch(removeFeature(feature.id)),

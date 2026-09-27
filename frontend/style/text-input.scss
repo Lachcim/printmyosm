@@ -13,12 +13,14 @@
     border: none;
     border-bottom: 2px solid #BDBDBD;
 
-    &.major {
-        font-size: 20pt;
+    &.major, &.minor {
         font-weight: 400;
 
-        &:focus{
+        &:focus {
             outline: none;
         }
     }
+
+    &.major { font-size: 20pt; }
+    &.minor { font-size: 16pt; }
 }

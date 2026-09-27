@@ -1,17 +1,22 @@
 import store from "../store/store";
 
+import { getFeatureFromJson } from "../features/features";
+
 export default class Feature {
     constructor(json) {
         this.id = json["id"];
         this.type = json["type"];
-        this.label = json["label"];
+        this.label = json["label"] ?? null;
     }
 
     toJson() {
-        return { id: this.id, type: this.type, label: this.label };
+        const label = this.label && { label: this.label };
+        return { id: this.id, type: this.type, ...label };
     }
 
-    getLabel() { return this.label ?? this.defaultLabel; }
+    clone() {
+        return getFeatureFromJson(this.toJson());
+    }
 
     get incomplete() {
         const state = store.getState();

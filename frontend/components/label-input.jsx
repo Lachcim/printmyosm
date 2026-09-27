@@ -48,9 +48,7 @@ export default function LabelInput({ onSubmit, ...props }) {
         </>
     );
 
-    if (props.major) {
-        return <h1 className="label-input major">{ inner }</h1>;
-    }
-
+    if (props.major) return <h1 className="label-input major">{ inner }</h1>;
+    if (props.minor) return <h2 className="label-input minor">{ inner }</h2>;
     return <p className="label-input">{ inner }</p>;
 }
