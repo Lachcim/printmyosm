@@ -36,8 +36,10 @@
             font-size: 10pt;
             margin-bottom: 0;
 
-            &:nth-child(odd) {
-                background-color: #FAFAFA;
+            &:not(:hover):not(.active) {
+                &:nth-child(odd) {
+                    background-color: #FAFAFA;
+                }
             }
         }
     }
