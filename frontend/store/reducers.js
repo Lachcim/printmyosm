@@ -26,16 +26,12 @@ export function reduceSetToolbarTab(state, action) {
     state.toolbar.tab = action.payload;
 
     if (action.payload != "feature") {
-        state.toolbar.tool = null;
         state.toolbar.activeFeature = null;
     }
 }
 
 export function reduceSetTool(state, action) {
-    state.toolbar.tool = action.payload;
-
-    if (action.payload != null)
-        state.toolbar.activeFeature = getFeatureFromJson({ id: uuidv4(), type: action.payload }).toJson();
+    state.toolbar.activeFeature = action.payload && getFeatureFromJson({ id: uuidv4(), type: action.payload }).toJson();
 }
 
 export function reduceSetZoomLevel(state, action) {
@@ -52,7 +48,10 @@ export function reduceCompleteFeature(state) {
 
     state.map.features.push(state.toolbar.activeFeature);
     state.toolbar.activeFeature = state.toolbar.activeFeature.id;
-    state.toolbar.tool = null;
+}
+
+export function reduceFocusFeature(state, action) {
+    state.toolbar.activeFeature = action.payload;
 }
 
 export function reduceUpdateFeature(state, action) {

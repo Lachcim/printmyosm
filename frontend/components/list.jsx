@@ -7,12 +7,12 @@ import "../style/list";
 
 import remove from "../assets/remove.svg";
 
-function ListItem({ children, onClick, onRemove }) {
+function ListItem({ children, onClick, onRemove, active }) {
     return (
         <li
             role="button"
             tabIndex={0}
-            className="button secondary"
+            className={`button secondary ${active && "active"}`}
             onClick={onClick}
             onKeyDown={onClick && (event => {
                 if (event.key == "Enter" || event.key == " ") {
@@ -59,7 +59,7 @@ export default function List({ items, emptyText, mini }) {
         <ul className={`list ${items.length == 0 && "empty"} ${mini && "mini"}`} ref={rawList}>
             {
                 items.map(item => (
-                    <ListItem key={item.key} onClick={item.onClick} onRemove={item.onRemove}>
+                    <ListItem key={item.key} onClick={item.onClick} onRemove={item.onRemove} active={item.active}>
                         { item.label }
                     </ListItem>)
                 )

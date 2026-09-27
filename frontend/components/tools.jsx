@@ -8,7 +8,7 @@ import "../style/tools";
 import { setTool } from "../store/actions";
 
 export default function Tools({ disabled }) {
-    const activeTool = useSelector(state => state.toolbar.tool);
+    const activeTool = useSelector(state => state.toolbar.activeFeature?.type || null);
     const dispatch = useDispatch();
 
     const tools = [
