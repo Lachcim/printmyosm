@@ -3,14 +3,6 @@
     margin-left: 1rem;
     position: relative;
 
-    h2 {
-        font-size: 16pt;
-
-        &:first-child {
-            margin-top: 0;
-        }
-    }
-
     .disabled-overlay {
         position: absolute;
         left: 0;
