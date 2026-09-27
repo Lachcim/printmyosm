@@ -40,14 +40,12 @@ app.get("/maps/:id", async (req, res) => {
 });
 
 app.put("/maps/:id", async (req, res) => {
-    let maps = await getMaps();
-    maps = maps.filter(map => map.id != req.params.id);
+    const mapsExcludingCurrent = (await getMaps()).filter(map => map.id != req.params.id);
 
-    if (req.body.features.length > 0 || req.body.geometry != null) {
-        maps = [req.body, ...maps];
-    }
+    const map = req.body;
+    const mapNotEmpty = map.name != null || map.features.length > 0 || map.geometry != null;
 
-    saveMaps(maps);
+    saveMaps(mapNotEmpty ? [map, ...mapsExcludingCurrent] : mapsExcludingCurrent);
     res.send();
 });
 
