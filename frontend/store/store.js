@@ -7,7 +7,8 @@ const initialState = {
     toolbar: {
         tab: "features",
         tool: null,
-        activeFeature: null
+        activeFeature: null,
+        highlightedFeature: null
     },
     map: null,
     mapView: {
@@ -30,6 +31,7 @@ const store = configureStore({
         builder.addCase(actions.updateFeature, reducers.reduceUpdateFeature);
         builder.addCase(actions.printAreaStarted, reducers.reducePrintAreaStarted);
         builder.addCase(actions.removeFeature, reducers.reduceRemoveFeature);
+        builder.addCase(actions.highlightFeature, reducers.reduceHighlightFeature);
     })
 });
 

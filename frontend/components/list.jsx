@@ -7,7 +7,7 @@ import "../style/list";
 
 import remove from "../assets/remove.svg";
 
-function ListItem({ children, onClick, onRemove, active }) {
+function ListItem({ children, onClick, onRemove, active, ...props }) {
     return (
         <li
             role="button"
@@ -20,6 +20,7 @@ function ListItem({ children, onClick, onRemove, active }) {
                     onClick();
                 }
             })}
+            {...props}
         >
             <span>{ children }</span>
             {
@@ -58,11 +59,15 @@ export default function List({ items, emptyText, mini }) {
     return (
         <ul className={`list ${items.length == 0 && "empty"} ${mini && "mini"}`} ref={rawList}>
             {
-                items.map(item => (
-                    <ListItem key={item.key} onClick={item.onClick} onRemove={item.onRemove} active={item.active}>
-                        { item.label }
-                    </ListItem>)
-                )
+                items.map(item => {
+                    const { label, key, ...itemProps } = item;
+
+                    return (
+                        <ListItem key={key} {...itemProps}>
+                            { label }
+                        </ListItem>
+                    );
+                })
             }
             {
                 emptyText && items.length == 0 && <p>{ emptyText }</p>

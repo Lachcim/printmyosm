@@ -1,5 +1,5 @@
 import React, { useContext, memo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CircleMarker, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
@@ -8,9 +8,11 @@ import Feature from "./feature";
 import store from "../store/store";
 import { completeFeature, updateFeature } from "../store/actions";
 
-const PolylineVector = memo(function PolylineVector({ points, color }) {
+const PolylineVector = memo(function PolylineVector({ id, points, color }) {
+    const highlightedFeature = useSelector(state => state.toolbar.highlightedFeature);
+
     const style = {
-        weight: 1,
+        weight: highlightedFeature == id ? 2 : 1,
         dashArray: [10, 5],
         color
     };
@@ -103,6 +105,7 @@ export default class Line extends Feature {
 
         return (
             <PolylineVector
+                id={this.id}
                 points={this.points}
                 color={this.resolveColor()}
                 key={this.id}

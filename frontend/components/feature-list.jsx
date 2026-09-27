@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import List from "./list";
 import { getFeatureFromJson } from "../features/features";
-import { focusFeature, removeFeature } from "../store/actions";
+import { focusFeature, highlightFeature, removeFeature } from "../store/actions";
 
 export default function FeatureList() {
     const dispatch = useDispatch();
@@ -18,7 +18,11 @@ export default function FeatureList() {
         key: feature.id,
         onClick: () => dispatch(focusFeature(feature.id)),
         onRemove: () => dispatch(removeFeature(feature.id)),
-        active: feature.id == activeFeatureId
+        active: feature.id == activeFeatureId,
+        onMouseOver: () => dispatch(highlightFeature(feature.id)),
+        onMouseOut: () => dispatch(highlightFeature(null)),
+        onFocus: () => dispatch(highlightFeature(feature.id)),
+        onBlur: () => dispatch(highlightFeature(null))
     }));
 
     return (

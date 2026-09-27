@@ -1,4 +1,5 @@
 import React, { useContext, memo } from "react";
+import { useSelector } from "react-redux";
 
 import { MapHoverContext } from "../components/map";
 import DivMarker from "./div-marker";
@@ -7,10 +8,12 @@ import Feature from "./feature";
 import store from "../store/store";
 import { completeFeature, updateFeature } from "../store/actions";
 
-const PointVector = memo(function PointVector({ coordinates, color }) {
+const PointVector = memo(function PointVector({ id, coordinates, color }) {
+    const highlightedFeature = useSelector(state => state.toolbar.highlightedFeature);
+
     const html = `
         <svg viewBox="-5 -5 10 10">
-            <path stroke="${color}" d="M -5 -5 L 5 5 M 5 -5 L -5 5"/>
+            <path stroke="${color}" stroke-width="${highlightedFeature == id ? 2 : 1}" d="M -5 -5 L 5 5 M 5 -5 L -5 5"/>
         </svg>
     `;
 
@@ -82,6 +85,7 @@ export default class Point extends Feature {
 
         return (
             <PointVector
+                id={this.id}
                 coordinates={this.coordinates}
                 color={this.resolveColor()}
                 key={this.id}

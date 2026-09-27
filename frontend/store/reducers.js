@@ -80,3 +80,7 @@ export function reduceRemoveFeature(state, action) {
     if (state.toolbar.activeFeature == action.payload)
         state.toolbar.activeFeature = null;
 }
+
+export function reduceHighlightFeature(state, action) {
+    state.toolbar.highlightedFeature = action.payload;
+}

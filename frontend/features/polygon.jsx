@@ -1,5 +1,5 @@
 import React, { useContext, memo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CircleMarker, Polygon as LeftletPolygon, Polyline } from "react-leaflet";
 
 import { MapHoverContext } from "../components/map";
@@ -8,20 +8,22 @@ import Feature from "./feature";
 import store from "../store/store";
 import { completeFeature, updateFeature } from "../store/actions";
 
-const getStyle = (color, heavy) => {
+const getStyle = (color, heavy, highlighted) => {
     return {
         color: heavy ? "#31572C" : color,
-        weight: heavy ? 2 : 1,
+        weight: (heavy ? 2 : 1) * (highlighted ? 2 : 1),
         fill: !heavy,
         fillOpacity: 0.1,
         lineJoin: heavy ? "miter" : "round"
     };
 };
 
-const PolygonVector = memo(function PolygonVector({ points, color, heavy }) {
+const PolygonVector = memo(function PolygonVector({ id, points, color, heavy }) {
+    const highlightedFeature = useSelector(state => state.toolbar.highlightedFeature);
+
     return (
         <LeftletPolygon
-            pathOptions={getStyle(color, heavy)}
+            pathOptions={getStyle(color, heavy, highlightedFeature == id)}
             positions={points}
             interactive={false}
         />
@@ -110,6 +112,7 @@ export default class Polygon extends Feature {
 
         return (
             <PolygonVector
+                id={this.id}
                 points={this.points}
                 key={this.id}
                 {...style}
