@@ -42,8 +42,10 @@ export default function List({ items, emptyText, mini }) {
     const previousItemCount = useRef(items.length);
 
     useEffect(() => {
-        if (items.length <= previousItemCount.current)
+        if (items.length <= previousItemCount.current) {
+            previousItemCount.current = items.length;
             return;
+        }
 
         const ul = rawList.current;
         if (ul) {
