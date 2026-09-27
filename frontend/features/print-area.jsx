@@ -22,14 +22,11 @@ export default class PrintArea extends Polygon {
         }
     }
 
-    static style = {
-        weight: 2,
-        color: "#31572C",
-        fill: false,
-        lineJoin: "miter"
-    };
+    get heavy() {
+        return true;
+    }
 
-    getStyle() {
-        return PrintArea.style;
+    get defaultColor() {
+        return null;
     }
 }

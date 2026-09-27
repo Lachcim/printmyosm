@@ -8,19 +8,31 @@ import Feature from "./feature";
 import store from "../store/store";
 import { completeFeature, updateFeature } from "../store/actions";
 
-const PolygonVector = memo(function PolygonVector({ points, style }) {
+const getStyle = (color, heavy) => {
+    return {
+        color: heavy ? "#31572C" : color,
+        weight: heavy ? 2 : 1,
+        fill: !heavy,
+        fillOpacity: 0.1,
+        lineJoin: heavy ? "miter" : "round"
+    };
+};
+
+const PolygonVector = memo(function PolygonVector({ points, color, heavy }) {
     return (
         <LeftletPolygon
-            pathOptions={style}
+            pathOptions={getStyle(color, heavy)}
             positions={points}
             interactive={false}
         />
     );
 });
 
-function IncompletePolygonVector({ points, style }) {
+function IncompletePolygonVector({ points, color, heavy }) {
     const mousePosition = useContext(MapHoverContext);
     const dispatch = useDispatch();
+
+    const style = getStyle(color, heavy);
 
     const getCompleteCircle = () => {
         if (points.length < 3)
@@ -74,23 +86,24 @@ export default class Polygon extends Feature {
         store.dispatch(updateFeature(this.toJson()));
     }
 
-    static style = {
-        weight: 1,
-        color: "#BF360C",
-        fillOpacity: 0.1
-    };
+    get heavy() {
+        return false;
+    }
 
-    getStyle() {
-        return Polygon.style;
+    get defaultColor() {
+        return "orange";
     }
 
     render() {
+        const color = !this.heavy && { color: this.resolveColor() };
+        const style = { heavy: this.heavy, ...color };
+
         if (this.incomplete) {
             return (
                 <IncompletePolygonVector
                     points={this.points}
-                    style={this.getStyle()}
                     key={this.id}
+                    {...style}
                 />
             );
         }
@@ -98,8 +111,8 @@ export default class Polygon extends Feature {
         return (
             <PolygonVector
                 points={this.points}
-                style={this.getStyle()}
                 key={this.id}
+                {...style}
             />
         );
     }

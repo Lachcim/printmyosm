@@ -20,7 +20,7 @@ export function getFeatureFromJson(json) {
     throw new RangeError(`Invalid feature type ${type}`);
 }
 
-export function getFeatureById(id) {
+function getFeatureById(id) {
     const state = store.getState();
     const json = state.map?.features?.find(feature => feature.id == id);
     if (!json) return null;
@@ -28,20 +28,19 @@ export function getFeatureById(id) {
     return getFeatureFromJson(json);
 }
 
-function getActiveFeature() {
-    const state = store.getState();
-    const feature = state.toolbar.activeFeature;
+export function resolveActiveFeature(activeFeature) {
+    if (!activeFeature) return null;
 
-    if (!feature) return null;
+    if (activeFeature instanceof Object)
+        return getFeatureFromJson(activeFeature);
 
-    if (typeof feature == "string")
-        return getFeatureById(feature);
-
-    return getFeatureFromJson(feature);
+    return getFeatureById(activeFeature);
 }
 
 export function handleMapClick(event) {
-    const feature = getActiveFeature();
+    const state = store.getState();
+
+    const feature = resolveActiveFeature(state.toolbar.activeFeature);
     if (!feature) return;
 
     feature.handleMapClick(event);

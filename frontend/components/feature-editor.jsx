@@ -1,49 +1,24 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getFeatureById } from "../features/features";
+import React from "react";
+import { useSelector } from "react-redux";
+import { resolveActiveFeature } from "../features/features";
 
-import LabelInput from "./label-input";
-import { updateFeature } from "../store/actions";
-
-function FeatureLabel({ feature, disabled }) {
-    const [prevFeatureLabel, setPrevFeatureLabel] = useState(feature.label);
-    const [featureLabelInput, setFeatureLabelInput] = useState(feature.label ?? "");
-    const dispatch = useDispatch();
-
-    if (feature.label != prevFeatureLabel) {
-        setFeatureLabelInput(feature.label ?? "");
-        setPrevFeatureLabel(feature.label);
-    }
-
-    const renameFeature = () => {
-        const newFeature = feature.clone();
-        newFeature.label = featureLabelInput;
-        dispatch(updateFeature(newFeature.toJson()));
-    };
-
-    return (
-        <LabelInput
-            value={featureLabelInput}
-            onChange={event => setFeatureLabelInput(event.target.value)}
-            onSubmit={renameFeature}
-            placeholder={feature.defaultLabel}
-            disabled={disabled}
-            minor
-        />
-    );
-}
+import FeatureColorEditor from "./feature-color-editor";
+import FeatureLabelEditor from "./feature-label-editor";
 
 function FeatureEditorInner(props) {
+    const feature = props.feature;
+
     return (
         <>
-            <FeatureLabel {...props}/>
+            <FeatureLabelEditor {...props}/>
+            { feature.defaultColor && <FeatureColorEditor {...props}/> }
         </>
     );
 }
 
 export default function FeatureEditor({ disabled }) {
     const rawActiveFeature = useSelector(state => state.toolbar.activeFeature);
-    const activeFeature = getFeatureById(rawActiveFeature?.id ?? rawActiveFeature);
+    const activeFeature = resolveActiveFeature(rawActiveFeature);
 
     if (!activeFeature)
         return;

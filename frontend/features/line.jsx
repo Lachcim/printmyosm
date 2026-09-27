@@ -8,7 +8,13 @@ import Feature from "./feature";
 import store from "../store/store";
 import { completeFeature, updateFeature } from "../store/actions";
 
-const PolylineVector = memo(function PolylineVector({ points, style }) {
+const PolylineVector = memo(function PolylineVector({ points, color }) {
+    const style = {
+        weight: 1,
+        dashArray: [10, 5],
+        color
+    };
+
     return (
         <Polyline
             pathOptions={style}
@@ -18,7 +24,7 @@ const PolylineVector = memo(function PolylineVector({ points, style }) {
     );
 });
 
-function IncompletePolylineVector({ points, style }) {
+function IncompletePolylineVector({ points, color }) {
     const mousePosition = useContext(MapHoverContext);
     const dispatch = useDispatch();
 
@@ -35,6 +41,12 @@ function IncompletePolylineVector({ points, style }) {
                 bubblingMouseEvents={false}
             />
         );
+    };
+
+    const style = {
+        weight: 1,
+        dashArray: [10, 5],
+        color
     };
 
     return (
@@ -74,14 +86,8 @@ export default class Line extends Feature {
         store.dispatch(updateFeature(this.toJson()));
     }
 
-    static style = {
-        weight: 1,
-        color: "#F44336",
-        dashArray: [10, 5]
-    };
-
-    getStyle() {
-        return Line.style;
+    get defaultColor() {
+        return "red";
     }
 
     render() {
@@ -89,7 +95,7 @@ export default class Line extends Feature {
             return (
                 <IncompletePolylineVector
                     points={this.points}
-                    style={this.getStyle()}
+                    color={this.resolveColor()}
                     key={this.id}
                 />
             );
@@ -98,7 +104,7 @@ export default class Line extends Feature {
         return (
             <PolylineVector
                 points={this.points}
-                style={this.getStyle()}
+                color={this.resolveColor()}
                 key={this.id}
             />
         );

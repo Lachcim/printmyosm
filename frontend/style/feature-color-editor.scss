@@ -1,0 +1,15 @@
+.feature-color-editor {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+
+    & > .color {
+        padding: 0.25rem;
+
+        & > div {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    }
+}

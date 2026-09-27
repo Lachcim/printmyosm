@@ -66,15 +66,15 @@ export default class Point extends Feature {
         store.dispatch(completeFeature());
     }
 
-    getColor() {
-        return "#BF360C";
+    get defaultColor() {
+        return "red";
     }
 
     render() {
         if (this.incomplete) {
             return (
                 <IncompletePointVector
-                    color={this.getColor()}
+                    color={this.resolveColor()}
                     key={this.id}
                 />
             );
@@ -83,7 +83,7 @@ export default class Point extends Feature {
         return (
             <PointVector
                 coordinates={this.coordinates}
-                color={this.getColor()}
+                color={this.resolveColor()}
                 key={this.id}
             />
         );
