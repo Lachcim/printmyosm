@@ -2,6 +2,7 @@ import { createAction } from "@reduxjs/toolkit";
 
 export const createNewMap = createAction("createNewMap");
 export const loadMap = createAction("loadMap");
+export const setMapName = createAction("setMapName");
 export const setToolbarTab = createAction("setToolbarTab");
 export const setTool = createAction("setTool");
 export const setZoomLevel = createAction("setZoomLevel");

@@ -15,6 +15,13 @@ export function reduceLoadMap(state, action) {
     state.map = action.payload;
 }
 
+export function reduceSetMapName(state, action) {
+    if (!state.map)
+        return;
+
+    state.map.name = action.payload;
+}
+
 export function reduceSetToolbarTab(state, action) {
     state.toolbar.tab = action.payload;
 

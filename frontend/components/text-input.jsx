@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 import "../style/text-input";
 
-export default function TextInput({ className, ...props }) {
-    const [value, setValue] = useState("");
+export default function TextInput({ major, autofocus, ...props }) {
+    const inputRef = useRef();
+    const shouldAutofocus = useRef(autofocus);
+
+    useEffect(() => {
+        if (shouldAutofocus.current) {
+            inputRef.current.select();
+            shouldAutofocus.current = false;
+        }
+    }, []);
 
     return (
         <input
             type="text"
-            className={`text-input ${className}`}
-            value={value}
-            onChange={event => setValue(event.target.value)}
+            className={`text-input ${major && "major"}`}
+            ref={inputRef}
             {...props}
         />
     );

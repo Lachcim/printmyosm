@@ -20,6 +20,7 @@ const store = configureStore({
     reducer: createReducer(initialState, builder => {
         builder.addCase(actions.createNewMap, reducers.reduceCreateNewMap);
         builder.addCase(actions.loadMap, reducers.reduceLoadMap);
+        builder.addCase(actions.setMapName, reducers.reduceSetMapName);
         builder.addCase(actions.setToolbarTab, reducers.reduceSetToolbarTab);
         builder.addCase(actions.setTool, reducers.reduceSetTool);
         builder.addCase(actions.setZoomLevel, reducers.reduceSetZoomLevel);

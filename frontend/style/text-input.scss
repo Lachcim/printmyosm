@@ -1,5 +1,6 @@
 .text-input {
     display: block;
+    width: 100%;
 
     color: inherit;
     font-family: inherit;
@@ -8,5 +9,16 @@
 
     margin: 0;
     padding: 0;
+
     border: none;
+    border-bottom: 2px solid #BDBDBD;
+
+    &.major {
+        font-size: 20pt;
+        font-weight: 400;
+
+        &:focus{
+            outline: none;
+        }
+    }
 }
