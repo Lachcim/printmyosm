@@ -29,7 +29,8 @@ export default function ToolbarNav({ disabled }) {
                         key={tab.name}
                         className="toolbar-button"
                         active={currentTab == tab.name}
-                        onClick={() => { if (!disabled) dispatch(setToolbarTab(tab.name)); }}
+                        onClick={() => dispatch(setToolbarTab(tab.name))}
+                        disabled={disabled}
                     >
                         <img src={tab.icon}/>
                         { tab.label }

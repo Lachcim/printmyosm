@@ -28,7 +28,8 @@ export default function Tools({ disabled }) {
                         secondary
                         className="tool-button"
                         active={activeTool == tool.name}
-                        onClick={() => { if (!disabled) dispatch(setTool(tool.name)); }}
+                        onClick={() => dispatch(setTool(tool.name))}
+                        disabled={disabled}
                     >
                         { tool.label }
                     </Button>
