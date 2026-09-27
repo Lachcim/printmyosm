@@ -14,10 +14,12 @@ export default function Toolbar() {
 
     return (
         <div className="toolbar">
-            <ToolbarNav disabled={disabled}/>
-            { tab == "features" && <FeaturesTab disabled={disabled}/> }
-            { tab == "geometry" && <GeometryTab disabled={disabled}/> }
-            { tab == "print" && <PrintTab disabled={disabled}/> }
+            <div>
+                <ToolbarNav disabled={disabled}/>
+                { tab == "features" && <FeaturesTab disabled={disabled}/> }
+                { tab == "geometry" && <GeometryTab disabled={disabled}/> }
+                { tab == "print" && <PrintTab disabled={disabled}/> }
+            </div>
             { disabled && <div className="disabled-overlay"/> }
         </div>
     );
