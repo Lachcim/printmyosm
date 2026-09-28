@@ -6,7 +6,7 @@ import "../style/dropdown";
 
 export default function Dropdown({ items, value, onValueChange, className, numerical }) {
     return (
-        <Select.Root value={value ?? undefined} onValueChange={onValueChange}>
+        <Select.Root value={value ?? ""} onValueChange={onValueChange}>
             <Select.Trigger className={`dropdown-trigger button secondary ${className}`}>
                 <Select.Value placeholder="Choose"/>
                 <Select.Icon className="icon"/>

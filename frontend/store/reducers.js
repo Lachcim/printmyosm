@@ -90,3 +90,7 @@ export function reduceRemoveFeature(state, action) {
 export function reduceHighlightFeature(state, action) {
     state.toolbar.highlightedFeature = action.payload;
 }
+
+export function reduceSetGeometry(state, action) {
+    state.map.geometry = action.payload;
+}

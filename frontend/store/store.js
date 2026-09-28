@@ -32,6 +32,7 @@ const store = configureStore({
         builder.addCase(actions.printAreaStarted, reducers.reducePrintAreaStarted);
         builder.addCase(actions.removeFeature, reducers.reduceRemoveFeature);
         builder.addCase(actions.highlightFeature, reducers.reduceHighlightFeature);
+        builder.addCase(actions.setGeometry, reducers.reduceSetGeometry);
     })
 });
 
