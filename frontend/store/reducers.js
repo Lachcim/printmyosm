@@ -7,7 +7,13 @@ export function reduceCreateNewMap(state) {
         id: uuidv4(),
         name: null,
         features: [],
-        geometry: null
+        geometry: {
+            zoomLevel: null,
+            scale: null,
+            paperSize: null,
+            landscape: false,
+            borderless: false
+        }
     };
 }
 

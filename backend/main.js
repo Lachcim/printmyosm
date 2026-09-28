@@ -43,7 +43,7 @@ app.put("/maps/:id", async (req, res) => {
     const mapsExcludingCurrent = (await getMaps()).filter(map => map.id != req.params.id);
 
     const map = req.body;
-    const mapNotEmpty = map.name != null || map.features.length > 0 || map.geometry != null;
+    const mapNotEmpty = map.name != null || map.features.length > 0;
 
     saveMaps(mapNotEmpty ? [map, ...mapsExcludingCurrent] : mapsExcludingCurrent);
     res.send();
