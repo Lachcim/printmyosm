@@ -3,12 +3,25 @@ import { getBoundingBox, getMetersPerTile, latLongToTileXY, makePolygon } from "
 
 export default class Atlas {
     static paperSizes = [
-        { name: "A0", width: 841, height: 1189 },
-        { name: "A1", width: 594, height: 841 },
-        { name: "A2", width: 420, height: 594 },
-        { name: "A3", width: 297, height: 420 },
-        { name: "A4", width: 210, height: 297 },
-        { name: "A5", width: 148, height: 210 }
+        { value: "A0", width: 841, height: 1189, description: "841 × 1189 mm" },
+        { value: "A1", width: 594, height: 841, description: "594 × 841 mm" },
+        { value: "A2", width: 420, height: 594, description: "420 × 594 mm" },
+        { value: "A3", width: 297, height: 420, description: "297 × 420 mm" },
+        { value: "A4", width: 210, height: 297, description: "210 × 297 mm" },
+        { value: "A5", width: 148, height: 210, description: "148 × 210 mm" }
+    ];
+
+    static scales = [
+        { value: 10000, label: "1:10 000", description: "1 km = 10 cm" },
+        { value: 20000, label: "1:20 000", description: "1 km = 5 cm" },
+        { value: 25000, label: "1:25 000", description: "1 km = 4 cm" },
+        { value: 33333, label: "1:33 333", description: "1 km = 3 cm" },
+        { value: 50000, label: "1:50 000", description: "1 km = 2 cm" },
+        { value: 100000, label: "1:100 000", description: "1 cm = 1 km" },
+        { value: 200000, label: "1:200 000", description: "1 cm = 2 km" },
+        { value: 300000, label: "1:300 000", description: "1 cm = 3 km" },
+        { value: 400000, label: "1:400 000", description: "1 cm = 4 km" },
+        { value: 500000, label: "1:500 000", description: "1 cm = 5 km" },
     ];
 
     constructor(printAreaLatLong, geometry) {
