@@ -6,7 +6,6 @@ import Button from "./button";
 import "../style/toolbar-nav";
 
 import compass from "../assets/compass.svg";
-import document from "../assets/document.svg";
 import polygon from "../assets/polygon.svg";
 
 import { setToolbarTab } from "../store/actions";
@@ -17,8 +16,7 @@ export default function ToolbarNav({ disabled }) {
 
     const tabs = [
         { name: "features", label: "Features", icon: polygon },
-        { name: "geometry", label: "Geometry", icon: compass },
-        { name: "print", label: "Print", icon: document },
+        { name: "geometry", label: "Geometry", icon: compass }
     ];
 
     return (
