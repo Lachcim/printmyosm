@@ -1,0 +1,52 @@
+.zoom-selector-trigger {
+    width: 100%;
+    height: 4rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+
+    text-align: left;
+
+    .value, .placeholder {
+        flex: 1;
+    }
+    .icon {
+        margin-left: 0.25rem;
+    }
+}
+
+.zoom-selector-content {
+    display: flex;
+    background-color: #EEEEEE;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0 5px;
+
+    position: relative;
+    bottom: var(--radix-popover-trigger-height);
+    width: var(--radix-popover-trigger-width);
+    min-height: var(--radix-popover-trigger-height);
+
+    & > div {
+        flex: 1;
+        margin: 0.5rem;
+
+        p {
+            margin: 0.25rem 0;
+        }
+        .tip {
+            font-size: 10pt;
+        }
+
+        .done {
+            display: block;
+            width: 100%;
+            padding: 0.125em 0.25em 0.25em;
+        }
+    }
+}
+
+.zoom-selector-trigger, .zoom-selector-content {
+    .value {
+        font-weight: 400;
+    }
+}

@@ -1,15 +1,18 @@
 import React from "react";
 import * as Select from "@radix-ui/react-select";
 
-import "../style/button";
+import Button from "./button";
+
 import "../style/dropdown";
 
-export default function Dropdown({ items, value, onValueChange, className, numerical }) {
+export default function Dropdown({ items, value, onValueChange, numerical }) {
     return (
         <Select.Root value={value ?? ""} onValueChange={onValueChange}>
-            <Select.Trigger className={`dropdown-trigger button secondary ${className}`}>
-                <Select.Value placeholder="Choose"/>
-                <Select.Icon className="icon"/>
+            <Select.Trigger asChild>
+                <Button secondary className="dropdown-trigger">
+                    <Select.Value placeholder="Choose"/>
+                    <Select.Icon className="icon"/>
+                </Button>
             </Select.Trigger>
             <Select.Portal>
                 <Select.Content className={`dropdown-content ${numerical && "numerical"}`}>

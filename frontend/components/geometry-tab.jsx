@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Atlas from "../atlas/atlas";
 import Dropdown from "./dropdown";
 import ToolbarTab from "./toolbar-tab";
+import ZoomSelector from "./zoom-selector";
 
 import { setGeometry } from "../store/actions";
 
@@ -27,6 +28,7 @@ export default function GeometryTab() {
     ];
 
     const setScale = scale => { dispatch(setGeometry({ ...geometry, scale })); };
+    const setZoomLevel = zoomLevel => { dispatch(setGeometry({ ...geometry, zoomLevel })); };
     const setPaperSize = paperSize => { dispatch(setGeometry({ ...geometry, paperSize })); };
     const setLandscape = landscape => { dispatch(setGeometry({ ...geometry, landscape })); };
     const setBorderless = borderless => { dispatch(setGeometry({ ...geometry, borderless })); };
@@ -37,23 +39,23 @@ export default function GeometryTab() {
             <div className="geometry-settings">
                 <div>
                     <h3>Scale</h3>
-                    <Dropdown className="setting-dropdown" items={Atlas.scales} value={geometry.scale} onValueChange={setScale} numerical/>
+                    <Dropdown items={Atlas.scales} value={geometry.scale} onValueChange={setScale} numerical/>
                 </div>
                 <div>
                     <h3>Zoom level</h3>
-                    <Dropdown className="setting-dropdown" items={Atlas.paperSizes} value={geometry.zoomLevel}/>
+                    <ZoomSelector value={geometry.zoomLevel} onCapture={setZoomLevel}/>
                 </div>
                 <div>
                     <h3>Paper size</h3>
-                    <Dropdown className="setting-dropdown" items={Atlas.paperSizes} value={geometry.paperSize} onValueChange={setPaperSize}/>
+                    <Dropdown items={Atlas.paperSizes} value={geometry.paperSize} onValueChange={setPaperSize}/>
                 </div>
                 <div>
                     <h3>Layout</h3>
-                    <Dropdown className="setting-dropdown" items={layouts} value={geometry.landscape} onValueChange={setLandscape}/>
+                    <Dropdown items={layouts} value={geometry.landscape} onValueChange={setLandscape}/>
                 </div>
                 <div>
                     <h3>Margins</h3>
-                    <Dropdown className="setting-dropdown" items={marginSettings} value={geometry.borderless} onValueChange={setBorderless}/>
+                    <Dropdown items={marginSettings} value={geometry.borderless} onValueChange={setBorderless}/>
                 </div>
             </div>
         </ToolbarTab>
