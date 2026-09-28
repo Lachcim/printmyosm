@@ -58,7 +58,7 @@ export default class Atlas {
     }
 
     static getPageSize(geometry, metersPerTile) {
-        const paperData = Atlas.paperSizes.find(entry => entry.name == geometry.paperSize);
+        const paperData = Atlas.paperSizes.find(entry => entry.value == geometry.paperSize);
         if (!paperData)
             throw RangeError(`Unknown paper size ${geometry.paperSize}`);
 

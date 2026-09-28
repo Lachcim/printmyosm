@@ -1,19 +1,43 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import Atlas from "../atlas/atlas";
+import Error from "./error";
 import Dropdown from "./dropdown";
 import ToolbarTab from "./toolbar-tab";
 import ZoomSelector from "./zoom-selector";
 
 import { setGeometry } from "../store/actions";
 
+import Atlas from "../atlas/atlas";
+import { AtlasContext } from "../app";
+
 import "../style/geometry-tab";
 
 export default function GeometryTab() {
+    const [atlas, setAtlas] = useContext(AtlasContext);
+    const dispatch = useDispatch();
+
     const features = useSelector(state => state.map?.features);
     const geometry = useSelector(state => state.map?.geometry);
-    const dispatch = useDispatch();
+
+    const printArea = features.find(feature => feature.type == "printArea");
+
+    const scaleSet = geometry.scale != null;
+    const zoomLevelSet = geometry.zoomLevel != null;
+    const paperSizeSet = geometry.paperSize != null;
+    const geometryComplete = scaleSet && zoomLevelSet && paperSizeSet;
+
+    useEffect(() => {
+        const cleanup = () => setAtlas(null);
+
+        if (!geometryComplete || !printArea) {
+            setAtlas(null);
+            return cleanup;
+        }
+
+        setAtlas(new Atlas(printArea.points, geometry));
+        return cleanup;
+    }, [geometry, geometryComplete, printArea, setAtlas]);
 
     if (!features || !geometry)
         return;
@@ -58,6 +82,18 @@ export default function GeometryTab() {
                     <Dropdown items={marginSettings} value={geometry.borderless} onValueChange={setBorderless}/>
                 </div>
             </div>
+            <h2>Print</h2>
+            {
+                !printArea && (
+                    <Error
+                        heading={"Print area not defined."}
+                        text={"Please use the features tab to define a print area."}
+                    />
+                )
+            }
+            {
+                atlas && <p>Atlas: { atlas.pages.length } pages</p>
+            }
         </ToolbarTab>
     );
 }
