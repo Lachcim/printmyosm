@@ -8,7 +8,17 @@
         margin-bottom: 0.5rem;
 
         & > span { flex: 1; }
-        & .remove { height: 0.75em; visibility: hidden; }
+        & .removeButton {
+            display: flex;
+            align-items: end;
+
+            & .remove {
+                color: "#424242";
+                width: 1.4em;
+                height: 1.4em;
+                visibility: hidden;
+            }
+        }
 
         &:hover, &:focus-within {
             & .remove {

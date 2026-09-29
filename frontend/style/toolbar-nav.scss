@@ -1,18 +1,21 @@
 .toolbar-nav {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
+
     margin-bottom: 1rem;
 
     .toolbar-button {
         display: flex;
         flex-direction: column;
+        align-items: center;
         flex: 1;
 
         font-size: 12pt;
 
-        img {
+        .icon {
+            width: 2rem;
             height: 2rem;
-            margin: 0.25rem 0;
         }
     }
 }

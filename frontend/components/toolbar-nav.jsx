@@ -1,12 +1,10 @@
 import React from "react";
+import { PiPolygonLight, PiPrinterLight } from "react-icons/pi";
 import { useSelector, useDispatch } from "react-redux";
 
 import Button from "./button";
 
 import "../style/toolbar-nav";
-
-import compass from "../assets/compass.svg";
-import polygon from "../assets/polygon.svg";
 
 import { setToolbarTab } from "../store/actions";
 
@@ -15,8 +13,8 @@ export default function ToolbarNav({ disabled }) {
     const dispatch = useDispatch();
 
     const tabs = [
-        { name: "features", label: "Features", icon: polygon },
-        { name: "print", label: "Print", icon: compass }
+        { name: "features", label: "Features", icon: <PiPolygonLight className="icon"/> },
+        { name: "print", label: "Print", icon: <PiPrinterLight className="icon"/> }
     ];
 
     return (
@@ -30,7 +28,7 @@ export default function ToolbarNav({ disabled }) {
                         onClick={() => dispatch(setToolbarTab(tab.name))}
                         disabled={disabled}
                     >
-                        <img src={tab.icon}/>
+                        { tab.icon }
                         { tab.label }
                     </Button>
                 ))

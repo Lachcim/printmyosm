@@ -1,4 +1,5 @@
 import React from "react";
+import { PiCirclesThreeLight, PiHandGrabbingLight, PiLineSegmentsLight, PiPolygonLight, PiPolygon } from "react-icons/pi";
 import { useSelector, useDispatch } from "react-redux";
 
 import Button from "./button";
@@ -12,11 +13,11 @@ export default function Tools({ disabled }) {
     const dispatch = useDispatch();
 
     const tools = [
-        { name: null, label: "None" },
-        { name: "printArea", label: "Print area" },
-        { name: "line", label: "Line" },
-        { name: "polygon", label: "Polygon" },
-        { name: "point", label: "Point" },
+        { name: null, label: "None", icon: <PiHandGrabbingLight/> },
+        { name: "printArea", label: "Print area", icon: <PiPolygon/> },
+        { name: "line", label: "Line", icon: <PiLineSegmentsLight/> },
+        { name: "polygon", label: "Polygon", icon: <PiPolygonLight/> },
+        { name: "point", label: "Point", icon: <PiCirclesThreeLight/> },
     ];
 
     return (
@@ -31,6 +32,7 @@ export default function Tools({ disabled }) {
                         onClick={() => dispatch(setTool(tool.name))}
                         disabled={disabled}
                     >
+                        { tool.icon }
                         { tool.label }
                     </Button>
                 ))

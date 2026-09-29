@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from "react";
+import { IoClose } from "react-icons/io5";
 
 import Button from "./button";
 
 import "../style/button";
 import "../style/list";
-
-import remove from "../assets/remove.svg";
 
 function ListItem({ children, onClick, onRemove, active, ...props }) {
     return (
@@ -26,11 +25,12 @@ function ListItem({ children, onClick, onRemove, active, ...props }) {
             {
                 onRemove && (
                     <Button
+                        className="removeButton"
                         unobtrusive
                         onClick={event => { event.stopPropagation(); onRemove(); }}
                         onKeyDown={event => { event.stopPropagation(); }}
                     >
-                        <img src={remove} alt="Remove" className="remove"/>
+                        <IoClose alt="Remove" className="remove"/>
                     </Button>
                 )
             }

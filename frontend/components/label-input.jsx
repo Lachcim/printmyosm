@@ -1,11 +1,10 @@
 import React, { useState } from "react";
+import { HiPencil } from "react-icons/hi";
 
 import Button from "./button";
 import TextInput from "./text-input";
 
 import "../style/label-input";
-
-import pencil from "../assets/pencil.svg";
 
 function Edit({ onClick, disabled }) {
     return (
@@ -14,7 +13,7 @@ function Edit({ onClick, disabled }) {
             onClick={onClick}
             disabled={disabled}
         >
-            <img src={pencil} alt="Edit" className="edit"/>
+            <HiPencil className="edit"/>
         </Button>
     );
 }
