@@ -14,3 +14,5 @@ export const printAreaStarted = createAction("printAreaStarted");
 export const removeFeature = createAction("removeFeature");
 export const highlightFeature = createAction("highlightFeature");
 export const setGeometry = createAction("setGeometry");
+export const setRemainingTiles = createAction("setRemainingTiles");
+export const jobFinished = createAction("jobFinished");

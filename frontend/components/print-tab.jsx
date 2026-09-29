@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import AtlasStatistics from "./atlas-statistics";
 import Error from "./error";
@@ -8,9 +8,11 @@ import ToolbarTab from "./toolbar-tab";
 
 import Atlas, { AtlasError } from "../atlas/atlas";
 import { AtlasContext } from "../app";
+import { setRemainingTiles } from "../store/actions";
 
 export default function PrintTab() {
     const { setAtlas } = useContext(AtlasContext);
+    const dispatch = useDispatch(setRemainingTiles);
 
     const features = useSelector(state => state.map?.features);
     const geometry = useSelector(state => state.map?.geometry);
@@ -45,11 +47,29 @@ export default function PrintTab() {
         return () => setAtlas(null);
     }, [setAtlas, newAtlas]);
 
+    useEffect(() => {
+        const getRemainingTiles = async () => {
+            const response = await fetch("/atlas", {
+                method: "post",
+                body: JSON.stringify({
+                    zoomLevel: newAtlas.zoomLevel,
+                    tiles: Array.from(newAtlas.tiles)
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const { remainingTiles } = await response.json();
+            dispatch(setRemainingTiles({ remainingTiles, projected: true }));
+        };
+
+        if (newAtlas) getRemainingTiles();
+    }, [newAtlas, dispatch]);
+
     return (
         <ToolbarTab>
             <h2>Map geometry</h2>
-            <GeometrySettings/>
-            <h2>Atlas</h2>
             {
                 !printArea && (
                     <Error
@@ -58,6 +78,8 @@ export default function PrintTab() {
                     />
                 )
             }
+            <GeometrySettings/>
+            <h2>Atlas</h2>
             {
                 atlasError && <Error heading={atlasError.message} text={atlasError.details}/>
             }

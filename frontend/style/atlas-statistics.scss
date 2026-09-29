@@ -3,11 +3,16 @@
     gap: 0.5rem;
 
     & > div {
-        flex-basis: calc((100% - 1rem) / 3);
+        flex-grow: 1;
 
         .figure {
             font-size: 18pt;
             font-weight: 400;
+        }
+
+        &.downloaded {
+            width: 8rem;
+            flex-grow: 0;
         }
     }
 }

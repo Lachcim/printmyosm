@@ -94,3 +94,21 @@ export function reduceHighlightFeature(state, action) {
 export function reduceSetGeometry(state, action) {
     state.map.geometry = action.payload;
 }
+
+export function reduceSetRemainingTiles(state, action) {
+    const remainingTiles = action.payload.remainingTiles;
+
+    if (!remainingTiles) {
+        state.job = null;
+    }
+
+    state.job = {
+        status: action.payload.projected ? "notStarted" : "inProgress",
+        remainingTiles
+    };
+}
+
+export function reduceJobFinished(state) {
+    if (state.job != null)
+        state.job.status = "done";
+}

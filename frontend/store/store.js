@@ -14,7 +14,8 @@ const initialState = {
     mapView: {
         zoomLevel: null,
         tileSize: null
-    }
+    },
+    job: null
 };
 
 const store = configureStore({
@@ -33,6 +34,8 @@ const store = configureStore({
         builder.addCase(actions.removeFeature, reducers.reduceRemoveFeature);
         builder.addCase(actions.highlightFeature, reducers.reduceHighlightFeature);
         builder.addCase(actions.setGeometry, reducers.reduceSetGeometry);
+        builder.addCase(actions.setRemainingTiles, reducers.reduceSetRemainingTiles);
+        builder.addCase(actions.jobFinished, reducers.reduceJobFinished);
     })
 });
 

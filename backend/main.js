@@ -56,6 +56,20 @@ async function getMaps() {
     return JSON.parse(rawMaps);
 }
 
+async function getRemainingTiles(tiles, zoomLevel) {
+    const output = new Set(tiles);
+
+    const filenames = await readdir(tilesDir);
+    for (const filename of filenames) {
+        const presentTile = parseTileFilename(filename);
+
+        if (presentTile.zoom == zoomLevel)
+            output.delete(`${presentTile.x}/${presentTile.y}`);
+    }
+
+    return output;
+}
+
 async function saveMaps(maps) {
     await writeFile(mapsFile, JSON.stringify(maps));
 }
@@ -113,11 +127,16 @@ app.get("/tile/:zoom/:x/:y", async (req, res) => {
     res.sendFile(tilePath);
 });
 
+app.post("/atlas", async (req, res) => {
+    const tilesToDownload = await getRemainingTiles(req.body.tiles, req.body.zoomLevel);
+    res.json({ remainingTiles: tilesToDownload.size });
+});
+
 wss.on("connection", ws => {
     console.log("Connection received");
     let jobInProgress = false;
 
-    function startJob(zoomLevel, tilesToDownload) {
+    function startJob(tilesToDownload, zoomLevel) {
         const queue = new PQueue({
             concurrency: 10,
             intervalCap: 10,
@@ -133,6 +152,7 @@ wss.on("connection", ws => {
                 makeRetriable(
                     async () => {
                         if (y == 5498 && (x == 9208 || x == 9207)) {
+                            console.log(zoomLevel);
                             throw new Error("Failed to download tile");
                         }
                         else {
@@ -159,7 +179,7 @@ wss.on("connection", ws => {
             const inQueue = queue.size + queue.pending;
             console.log(`${inQueue} tiles remaining, ${failedTiles} tiles failed`);
 
-            ws.send(JSON.stringify({ remaining: inQueue + failedTiles }));
+            ws.send(JSON.stringify({ remainingTiles: inQueue + failedTiles }));
 
             if (inQueue == 0)
                 ws.close(1000);
@@ -172,7 +192,7 @@ wss.on("connection", ws => {
         const jobSize = queue.size + queue.pending;
         jobInProgress = true;
 
-        ws.send(JSON.stringify({ remaining: jobSize }));
+        ws.send(JSON.stringify({ remainingTiles: jobSize }));
         if (jobSize == 0)
             ws.close(1000);
     }
@@ -183,20 +203,13 @@ wss.on("connection", ws => {
             return;
         }
 
-        const body = JSON.parse(data);
-        const tilesToDownload = new Set(body.tiles);
-        const requestedTiles = tilesToDownload.size;
+        const { tiles, zoomLevel } = JSON.parse(data);
+        const tilesToDownload = getRemainingTiles(tiles, zoomLevel);
 
-        const filenames = await readdir(tilesDir);
-        for (const filename of filenames) {
-            const presentTile = parseTileFilename(filename);
-
-            if (presentTile.zoom == body.zoomLevel)
-                tilesToDownload.delete(`${presentTile.x}/${presentTile.y}`);
-        }
-
+        const requestedTiles = new Set(tiles).size;
         console.log(`Job started: requested ${requestedTiles} tiles, ${tilesToDownload.size} tiles remaining`);
-        startJob(body.zoomLevel, tilesToDownload);
+
+        startJob(tilesToDownload, zoomLevel);
     });
 
     ws.on("close", code => {
