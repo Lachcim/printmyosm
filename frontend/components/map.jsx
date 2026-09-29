@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState, memo } from "react";
+import React, { createContext, useEffect, useState, memo, useContext } from "react";
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -6,6 +6,9 @@ import "../style/map";
 
 import { getFeatureFromJson, handleMapClick } from "../features/features";
 import { setZoomLevel, setTileSize } from "../store/actions";
+
+import { AtlasContext } from "../app";
+import { PageVector } from "../atlas/page";
 
 export const MapHoverContext = createContext(null);
 
@@ -32,6 +35,7 @@ function MapController({ children }) {
 }
 
 const MapFeatures = memo(function MapFeatures() {
+    const [atlas] = useContext(AtlasContext);
     const features = useSelector(state => state.map?.features) ?? [];
     const activeFeature = useSelector(state => state.toolbar.activeFeature);
 
@@ -39,6 +43,7 @@ const MapFeatures = memo(function MapFeatures() {
         <>
             { features.map(feature => getFeatureFromJson(feature).render()) }
             { activeFeature instanceof Object && getFeatureFromJson(activeFeature).render() }
+            { atlas && atlas.pages.map(page => <PageVector key={page.id} page={page}/>) }
         </>
     );
 });

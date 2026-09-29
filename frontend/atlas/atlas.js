@@ -1,6 +1,14 @@
 import Page from "./page";
 import { getBoundingBox, getMetersPerTile, latLongToTileXY, makePolygon } from "./geometry";
 
+export class AtlasError extends Error {
+    constructor(message, details) {
+        super(message);
+        this.name = "AtlasError";
+        this.details = details;
+    }
+}
+
 export default class Atlas {
     static paperSizes = [
         { value: "A0", width: 841, height: 1189, description: "841 × 1189 mm" },
@@ -26,13 +34,16 @@ export default class Atlas {
 
     constructor(printAreaLatLong, geometry) {
         this.pages = [];
+        this.tiles = new Set();
+        this.zoomLevel = geometry.zoomLevel;
+        this.socket = null;
 
         const printArea = printAreaLatLong.map(
-            ([lat, long]) => latLongToTileXY(lat, long, geometry.zoomLevel)
+            ([lat, long]) => latLongToTileXY(lat, long, this.zoomLevel)
         );
 
         const boundingBox = getBoundingBox(printArea);
-        const metersPerTile = getMetersPerTile(boundingBox.middle.y, geometry.zoomLevel);
+        const metersPerTile = getMetersPerTile(boundingBox.middle.y, this.zoomLevel);
         const pageSize = Atlas.getPageSize(geometry, metersPerTile);
 
         const pagesX = Math.ceil((boundingBox.max.x - boundingBox.min.x) / pageSize.tiles.x);
@@ -48,11 +59,21 @@ export default class Atlas {
                 const x = startX + pageX * pageSize.tiles.x;
                 const y = startY + pageY * pageSize.tiles.y;
 
-                const page = new Page({ x, y }, pageSize);
+                const page = new Page({ x, y }, pageSize, this.zoomLevel);
                 if (!page.intersects(printAreaPolygon))
                     continue;
 
+                if (this.pages.length >= 100)
+                    throw new AtlasError("Page limit exceeded", "It would take over 100 pages to print this map.");
+
                 this.pages.push(page);
+
+                for (const tile of page.getTiles()) {
+                    this.tiles.add(tile);
+
+                    if (this.tiles.size >= 10000)
+                        throw new AtlasError("Tile limit exceeded", "It would take over 10000 tiles to print this map.");
+                }
             }
         }
     }
@@ -87,5 +108,29 @@ export default class Atlas {
                 y: coverageY / metersPerTile
             }
         };
+    }
+
+    startJob() {
+        if (this.socket != null)
+            throw Error("Job already started");
+
+        this.socket = new WebSocket("/");
+
+        this.socket.addEventListener("open", () => {
+            this.socket.send(
+                JSON.stringify({
+                    zoomLevel: this.zoomLevel,
+                    tiles: Array.from(this.tiles)
+                })
+            );
+        });
+
+        this.socket.addEventListener("message", event => {
+            console.log("Message from server", event.data);
+        });
+
+        this.socket.addEventListener("close", event => {
+            console.log("Closing", event.data);
+        });
     }
 }

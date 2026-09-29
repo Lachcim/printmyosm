@@ -1,6 +1,7 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import Button from "./button";
 import Error from "./error";
 import Dropdown from "./dropdown";
 import ToolbarTab from "./toolbar-tab";
@@ -8,7 +9,7 @@ import ZoomSelector from "./zoom-selector";
 
 import { setGeometry } from "../store/actions";
 
-import Atlas from "../atlas/atlas";
+import Atlas, { AtlasError } from "../atlas/atlas";
 import { AtlasContext } from "../app";
 
 import "../style/geometry-tab";
@@ -20,27 +21,35 @@ export default function GeometryTab() {
     const features = useSelector(state => state.map?.features);
     const geometry = useSelector(state => state.map?.geometry);
 
-    const printArea = features.find(feature => feature.type == "printArea");
+    const printArea = features?.find(feature => feature.type == "printArea");
 
-    const scaleSet = geometry.scale != null;
-    const zoomLevelSet = geometry.zoomLevel != null;
-    const paperSizeSet = geometry.paperSize != null;
+    const scaleSet = geometry?.scale != null;
+    const zoomLevelSet = geometry?.zoomLevel != null;
+    const paperSizeSet = geometry?.paperSize != null;
     const geometryComplete = scaleSet && zoomLevelSet && paperSizeSet;
 
-    useEffect(() => {
-        const cleanup = () => setAtlas(null);
-
-        if (!geometryComplete || !printArea) {
-            setAtlas(null);
-            return cleanup;
+    const { newAtlas, atlasError } = useMemo(() => {
+        if (!geometry || !geometryComplete || !printArea) {
+            return { newAtlas: null, atlasError: null };
         }
 
-        setAtlas(new Atlas(printArea.points, geometry));
-        return cleanup;
-    }, [geometry, geometryComplete, printArea, setAtlas]);
+        try {
+            const newAtlas = new Atlas(printArea.points, geometry);
+            return { newAtlas, atlasError: null };
+        }
+        catch (error) {
+            if (error instanceof AtlasError) {
+                return { newAtlas: null, atlasError: error };
+            }
 
-    if (!features || !geometry)
-        return;
+            throw error;
+        }
+    }, [geometry, geometryComplete, printArea]);
+
+    useEffect(() => {
+        setAtlas(newAtlas);
+        return () => setAtlas(null);
+    }, [setAtlas, newAtlas]);
 
     const layouts = [
         { value: false, label: "Portrait" },
@@ -56,6 +65,10 @@ export default function GeometryTab() {
     const setPaperSize = paperSize => { dispatch(setGeometry({ ...geometry, paperSize })); };
     const setLandscape = landscape => { dispatch(setGeometry({ ...geometry, landscape })); };
     const setBorderless = borderless => { dispatch(setGeometry({ ...geometry, borderless })); };
+
+    const startJob = async () => {
+        atlas.startJob();
+    };
 
     return (
         <ToolbarTab className="geometry-tab">
@@ -92,7 +105,15 @@ export default function GeometryTab() {
                 )
             }
             {
-                atlas && <p>Atlas: { atlas.pages.length } pages</p>
+                atlasError && <Error heading={atlasError.message} text={atlasError.details}/>
+            }
+            {
+                atlas && (
+                    <>
+                        <p>Atlas: { atlas.pages.length } pages, { atlas.tiles.size } tiles</p>
+                        <Button onClick={startJob}>Download</Button>
+                    </>
+                )
             }
         </ToolbarTab>
     );

@@ -42,11 +42,14 @@
     "@turf/boolean-intersects": "^7.4.0",
     "express": "^5.2.1",
     "leaflet": "^1.9.4",
+    "p-queue": "^9.3.3",
+    "p-retry": "^8.0.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-leaflet": "^5.0.0-rc.2",
     "react-redux": "^9.3.0",
     "redux": "^5.0.1",
-    "uuid": "^14.0.2"
+    "uuid": "^14.0.2",
+    "ws": "^8.22.0"
   }
 }
