@@ -4,7 +4,17 @@
     font-weight: 400;
 
     color: #FFFFFF;
-    background-color: #31572C;
+    background: linear-gradient(
+        -45deg,
+        #ECF39E 0,
+        #ECF39E 15rem,
+        #90A955 15rem,
+        #90A955 30rem,
+        #4F772D 30rem,
+        #4F772D 45rem,
+        #31572C 45rem,
+        #31572C 100%
+    );
 
     p {
         margin: 0.1em 0.3em 0;
