@@ -16,7 +16,7 @@ export default function ToolbarNav({ disabled }) {
 
     const tabs = [
         { name: "features", label: "Features", icon: polygon },
-        { name: "geometry", label: "Geometry", icon: compass }
+        { name: "print", label: "Print", icon: compass }
     ];
 
     return (

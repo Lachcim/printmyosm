@@ -1,0 +1,13 @@
+.atlas-statistics {
+    display: flex;
+    gap: 0.5rem;
+
+    & > div {
+        flex-basis: calc((100% - 1rem) / 3);
+
+        .figure {
+            font-size: 18pt;
+            font-weight: 400;
+        }
+    }
+}

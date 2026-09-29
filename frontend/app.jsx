@@ -12,11 +12,11 @@ import store from "./store/store";
 export const AtlasContext = createContext([null, () => {}]);
 
 export default function App() {
-    const atlas = useState(null);
+    const [atlas, setAtlas] = useState(null);
 
     return (
         <StoreProvider store={store}>
-            <AtlasContext value={atlas}>
+            <AtlasContext value={{ atlas, setAtlas }}>
                 <Header/>
                 <div className="map-toolbar">
                     <MapWelcome/>

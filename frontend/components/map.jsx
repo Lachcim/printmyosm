@@ -35,7 +35,7 @@ function MapController({ children }) {
 }
 
 const MapFeatures = memo(function MapFeatures() {
-    const [atlas] = useContext(AtlasContext);
+    const { atlas } = useContext(AtlasContext);
     const features = useSelector(state => state.map?.features) ?? [];
     const activeFeature = useSelector(state => state.toolbar.activeFeature);
 
