@@ -9,8 +9,6 @@ export default function AtlasPage({ page }) {
         height: `${page.size.printable.height}mm`
     };
 
-    console.log(printableStyle);
-
     return (
         <section className="atlas-page">
             <img src={pageSrc} style={printableStyle}/>
