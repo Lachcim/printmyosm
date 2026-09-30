@@ -27,6 +27,8 @@ export default class Page {
         this.position = position;
         this.size = size;
         this.zoomLevel = zoomLevel;
+        this.number = null;
+        this.neighbors = { top: null, left: null, bottom: null, right: null };
     }
 
     intersects(printArea) {

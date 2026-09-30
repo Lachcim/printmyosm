@@ -56,6 +56,7 @@ export default class Atlas {
         const startY = boundingBox.middle.y - pagesY / 2 * pageSize.tiles.y;
 
         const printAreaPolygon = makePolygon(printArea);
+        const grid = new Map();
 
         for (let pageY = 0; pageY < pagesY; pageY++) {
             for (let pageX = 0; pageX < pagesX; pageX++) {
@@ -70,12 +71,26 @@ export default class Atlas {
                     throw new AtlasError("Page limit exceeded", "It would take over 100 pages to print this map.");
 
                 this.pages.push(page);
+                page.number = this.pages.length;
 
                 for (const tile of page.getTiles()) {
                     this.tiles.add(tile);
 
                     if (this.tiles.size >= 10000)
                         throw new AtlasError("Tile limit exceeded", "It would take over 10000 tiles to print this map.");
+                }
+
+                grid.set(`${pageX}/${pageY}`, page);
+                const leftNeighbor = grid.get(`${pageX - 1}/${pageY}`);
+                const topNeighbor = grid.get(`${pageX}/${pageY - 1}`);
+
+                if (leftNeighbor) {
+                    leftNeighbor.neighbors.right = page.number;
+                    page.neighbors.left = leftNeighbor.number;
+                }
+                if (topNeighbor) {
+                    topNeighbor.neighbors.bottom = page.number;
+                    page.neighbors.top = topNeighbor.number;
                 }
             }
         }

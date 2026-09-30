@@ -8,6 +8,91 @@
 
     justify-content: center;
     align-items: center;
+
+    p {
+        position: absolute;
+
+        padding-block: 0.5rem;
+        padding-inline: 1rem;
+        margin: 0;
+
+        &.page-number {
+            width: 1cm;
+            box-sizing: border-box;
+
+            text-align: center;
+            font-weight: 400;
+
+            bottom: 0;
+
+            &.odd {
+                right: 0;
+                text-align: right;
+            }
+            &.even {
+                left: 0;
+                text-align: left;
+            }
+        }
+
+        &.map-name {
+            top: 0;
+            left: 1cm;
+            padding-left: 0;
+
+            font-weight: 400;
+        }
+
+        &.credits {
+            top: 0;
+            right: 1cm;
+            padding-right: 0;
+        }
+
+        &.neighbor {
+            text-align: center;
+            font-size: 10pt;
+
+            &.top {
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+            &.left {
+                top: 0;
+                left: 0;
+                bottom: 0;
+            }
+            &.bottom {
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+            &.right {
+                top: 0;
+                right: 0;
+                bottom: 0;
+            }
+
+            &.left, &.right {
+                writing-mode: sideways-lr;
+            }
+
+            svg {
+                height: 1.2em;
+                width: 1.2em;
+                margin-block-end: -0.2em;
+            }
+        }
+
+        &.scale {
+            bottom: 0;
+            left: 1cm;
+            padding-left: 0;
+
+            font-size: 10pt;
+        }
+    }
 }
 
 @media print {
