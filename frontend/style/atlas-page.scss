@@ -1,0 +1,17 @@
+.atlas-page {
+    display: none;
+    position: relative;
+
+    width: 100vw;
+    height: 100vh;
+    break-after: page;
+
+    justify-content: center;
+    align-items: center;
+}
+
+@media print {
+    #root > .atlas-page {
+        display: flex;
+    };
+}

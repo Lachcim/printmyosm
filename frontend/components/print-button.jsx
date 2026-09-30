@@ -6,7 +6,7 @@ import Button from "./button";
 
 import "../style/print-button";
 
-export default function PrintButton({ onStartJob, onStopJob, onPrint }) {
+export default function PrintButton({ onStartJob, onStopJob }) {
     const job = useSelector(state => state.job);
 
     if (!job)
@@ -17,7 +17,7 @@ export default function PrintButton({ onStartJob, onStopJob, onPrint }) {
             return {
                 label: "Print map",
                 icon: <PiMapTrifoldLight />,
-                onClick: onPrint
+                onClick: () => window.print()
             };
         }
 

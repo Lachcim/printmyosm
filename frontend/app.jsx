@@ -1,6 +1,7 @@
 import React from "react";
 import { Provider as StoreProvider } from "react-redux";
 
+import Atlas from "./components/atlas";
 import AtlasContextProvider from "./atlas/AtlasContextProvider";
 import Header from "./components/header";
 import MapWelcome from "./components/map-welcome";
@@ -19,6 +20,7 @@ export default function App() {
                     <MapWelcome/>
                     <Toolbar/>
                 </div>
+                <Atlas/>
             </AtlasContextProvider>
         </StoreProvider>
     );

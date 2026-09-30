@@ -16,6 +16,15 @@ body {
 
     padding: 1rem;
     box-sizing: border-box;
+
+    @media print {
+        display: block;
+        padding: 0;
+
+        & > * {
+            display: none;
+        }
+    }
 }
 
 .map-toolbar {
