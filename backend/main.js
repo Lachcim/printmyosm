@@ -3,6 +3,7 @@ import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import PQueue from "p-queue";
 import { makeRetriable } from "p-retry";
+import sharp from "sharp";
 
 import path from "node:path";
 import { createWriteStream, existsSync } from "node:fs";
@@ -227,4 +228,58 @@ wss.on("connection", ws => {
         else if (code == 4000) console.log("Connection closed: job already in progress");
         else console.log(`Connection closed: ${code}`);
     });
+});
+
+app.get("/page/:zoom/:x/:y/:width/:height", async (req, res) => {
+    const { zoom, x: pageX, y: pageY, width, height } = req.params;
+
+    const minX = Math.floor(parseFloat(pageX));
+    const minY = Math.floor(parseFloat(pageY));
+    const maxX = Math.floor(parseFloat(pageX) + parseFloat(width));
+    const maxY = Math.floor(parseFloat(pageY) + parseFloat(height));
+
+    const tiles = [];
+
+    let tileSize = null;
+    let offsetX = null;
+    let offsetY = null;
+
+    for (let y = minY; y <= maxY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+            const tilePath = getTilePath(x, y, zoom);
+
+            if (!existsSync(tilePath)) {
+                res.status(404);
+                res.send();
+                return;
+            }
+
+            if (tileSize == null) {
+                const sampleTile = await sharp(tilePath);
+                const tileMetadata = await sampleTile.metadata();
+
+                tileSize = tileMetadata.width;
+                offsetX = Math.floor((pageX - minX) * tileSize);
+                offsetY = Math.floor((pageY - minY) * tileSize);
+            }
+
+            tiles.push({
+                input: tilePath,
+                left: (x - minX) * tileSize - offsetX,
+                top: (y - minY) * tileSize - offsetY
+            });
+        }
+    }
+
+    const mapPage = await sharp({
+        create: {
+            width: Math.floor(width * tileSize),
+            height: Math.floor(height * tileSize),
+            channels: 3,
+            background: { r: 0, g: 0, b: 0 }
+        }
+    }).composite(tiles).jpeg().toBuffer();
+
+    res.type("jpeg");
+    res.send(mapPage);
 });
