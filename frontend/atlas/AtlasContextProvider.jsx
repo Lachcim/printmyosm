@@ -16,6 +16,7 @@ export default function AtlasContextProvider({ children }) {
 
         if (atlas != null) dispatch(createJob());
         if (prevAtlas.current != null && atlas == null) dispatch(destoryJob());
+        if (prevAtlas.current != null) prevAtlas.current.cleanUp();
 
         prevAtlas.current = atlas;
     }, [atlas, dispatch]);

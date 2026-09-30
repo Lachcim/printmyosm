@@ -16,6 +16,5 @@ export const highlightFeature = createAction("highlightFeature");
 export const setGeometry = createAction("setGeometry");
 export const createJob = createAction("createJob");
 export const destoryJob = createAction("destoryJob");
-export const startJob = createAction("startJob");
+export const setJobState = createAction("setJobState");
 export const setRemainingTiles = createAction("setRemainingTiles");
-export const finishJob = createAction("finishJob");

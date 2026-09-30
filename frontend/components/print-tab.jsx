@@ -87,6 +87,7 @@ export default function PrintTab() {
             <AtlasStatistics/>
             <PrintButton
                 onStartJob={() => newAtlas.startJob()}
+                onStopJob={() => newAtlas.stopJob()}
             />
         </ToolbarTab>
     );

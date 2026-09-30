@@ -36,9 +36,8 @@ const store = configureStore({
         builder.addCase(actions.setGeometry, reducers.reduceSetGeometry);
         builder.addCase(actions.createJob, reducers.reduceCreateJob);
         builder.addCase(actions.destoryJob, reducers.reduceDestroyJob);
-        builder.addCase(actions.startJob, reducers.reduceStartJob);
+        builder.addCase(actions.setJobState, reducers.reduceSetJobState);
         builder.addCase(actions.setRemainingTiles, reducers.reduceSetRemainingTiles);
-        builder.addCase(actions.finishJob, reducers.reduceFinishJob);
     })
 });
 

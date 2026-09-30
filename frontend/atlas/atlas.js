@@ -2,7 +2,7 @@ import Page from "./page";
 import { getBoundingBox, getMetersPerTile, latLongToTileXY, makePolygon } from "./geometry";
 
 import store from "../store/store";
-import { finishJob, setRemainingTiles, startJob } from "../store/actions";
+import { setJobState, setRemainingTiles } from "../store/actions";
 
 export class AtlasError extends Error {
     constructor(message, details) {
@@ -118,7 +118,7 @@ export default class Atlas {
             throw Error("Job already started");
 
         this.socket = new WebSocket("/");
-        store.dispatch(startJob());
+        store.dispatch(setJobState("inProgress"));
 
         this.socket.addEventListener("open", () => {
             this.socket.send(
@@ -130,13 +130,37 @@ export default class Atlas {
         });
 
         this.socket.addEventListener("message", event => {
+            if (this.socket == null)
+                return;
+
             const { remainingTiles } = JSON.parse(event.data);
             store.dispatch(setRemainingTiles(remainingTiles));
         });
 
         this.socket.addEventListener("close", () => {
-            store.dispatch(finishJob());
+            if (this.socket == null)
+                return;
+
+            store.dispatch(setJobState("done"));
             this.socket = null;
         });
+    }
+
+    stopJob() {
+        if (this.socket == null)
+            throw Error("Job already stopped");
+
+        this.socket.close(1000);
+        this.socket = null;
+        store.dispatch(setJobState("notStarted"));
+    }
+
+    cleanUp() {
+        if (this.socket == null)
+            return;
+
+        const socket = this.socket;
+        this.socket = null;
+        socket.close(1000);
     }
 }

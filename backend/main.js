@@ -24,17 +24,25 @@ server.listen(8080, () => {
 const mapsFile = path.join(import.meta.dirname, "..", "maps.json");
 const tilesDir = path.join(import.meta.dirname, "..", "tiles");
 
-function downloadTile(x, y, zoom, headers) {
+async function downloadTile(x, y, zoom, tilePath, headers, signal) {
     const url = `https://tile.tracestrack.com/topo__/${zoom}/${x}/${y}.webp?key=383118983d4a867dd2d367451720d724`;
 
-    return fetch(url, {
+    const response = await fetch(url, {
         method: "get",
         headers: {
             ...headers,
             host: new URL(url).host,
             referer: "https://www.openstreetmap.org/",
-        }
+        },
+        signal
     });
+
+    if (response.status == 200) {
+        const stream = Readable.fromWeb(response.body);
+        await finished(stream.pipe(createWriteStream(tilePath)));
+    }
+
+    return response;
 }
 
 function getTilePath(x, y, zoom) {
@@ -111,18 +119,12 @@ app.get("/tile/:zoom/:x/:y", async (req, res) => {
         return;
     }
 
-    const serverResponse = await downloadTile(x, y, zoom, req.headers);
+    const serverResponse = await downloadTile(x, y, zoom, tilePath, req.headers);
 
     res.status(serverResponse.status);
     serverResponse.headers.forEach((value, name) => {
         res.setHeader(name, value);
     });
-
-    const stream = Readable.fromWeb(serverResponse.body);
-
-    if (serverResponse.status == 200) {
-        await finished(stream.pipe(createWriteStream(tilePath)));
-    }
 
     res.sendFile(tilePath);
 });
@@ -134,9 +136,10 @@ app.post("/atlas", async (req, res) => {
 
 wss.on("connection", ws => {
     console.log("Connection received");
-    let jobInProgress = false;
+    let abortJob = null;
 
     function startJob(tilesToDownload, zoomLevel) {
+        const controller = new AbortController();
         const queue = new PQueue({
             concurrency: 10,
             intervalCap: 10,
@@ -150,32 +153,34 @@ wss.on("connection", ws => {
 
             queue.add(
                 makeRetriable(
-                    async () => {
-                        if (y == 5498 && (x == 9208 || x == 9207)) {
-                            console.log(zoomLevel);
-                            throw new Error("Failed to download tile");
-                        }
-                        else {
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                            return;
-                        }
+                    async ({ signal }) => {
+                        const tilePath = getTilePath(x, y, zoomLevel);
+                        const response = await downloadTile(x, y, zoomLevel, tilePath, null, signal);
 
-                        /*const response = await downloadTile(x, y, zoomLevel, null);
-                        if (!response.ok)
-                            throw new Error("Failed to download tile");*/
+                        if (response.status != 200)
+                            throw new Error("Failed to download tile");
                     },
                     {
                         retries: 3,
                         minTimeout: 3000,
                         onFailedAttempt: ({ retriesLeft }) => {
-                            console.log(retriesLeft ? `Tile (${x}, ${y}) failed, will retry` : `Tile (${x}, ${y}) failed`);
-                        }
+                            if (controller.signal.aborted) console.log(`Tile (${x}, ${y}) aborted`);
+                            else if (retriesLeft != 0) console.log(`Tile (${x}, ${y}) failed, will retry`);
+                            else console.log(`Tile (${x}, ${y}) failed`);
+                        },
+                        signal: controller.signal
                     }
                 ),
+                {
+                    signal: controller.signal
+                }
             ).catch(() => {});
         }
 
         queue.on("next", () => {
+            if (ws.readyState != WebSocket.OPEN)
+                return;
+
             const inQueue = queue.size + queue.pending;
             console.log(`${inQueue} tiles remaining, ${failedTiles} tiles failed`);
 
@@ -190,16 +195,17 @@ wss.on("connection", ws => {
         });
 
         const jobSize = queue.size + queue.pending;
-        jobInProgress = true;
-
         ws.send(JSON.stringify({ remainingTiles: jobSize }));
+
         if (jobSize == 0)
             ws.close(1000);
+
+        return () => controller.abort();
     }
 
     ws.on("message", async data => {
-        if (jobInProgress) {
-            ws.close(1002);
+        if (abortJob) {
+            ws.close(4000);
             return;
         }
 
@@ -209,13 +215,16 @@ wss.on("connection", ws => {
         const requestedTiles = new Set(tiles).size;
         console.log(`Job started: requested ${requestedTiles} tiles, ${tilesToDownload.size} tiles remaining`);
 
-        startJob(tilesToDownload, zoomLevel);
+        abortJob = startJob(tilesToDownload, zoomLevel);
     });
 
     ws.on("close", code => {
-        if (code == 1000) console.log("Job finished");
-        else if (code == 1001) console.log("Job terminated: going away");
-        else if (code == 1002) console.log("Job terminated: protocol error");
+        abortJob();
+        abortJob = null;
+
+        if (code == 1000) console.log("Connection closed");
+        else if (code == 1001) console.log("Connection closed: going away");
+        else if (code == 4000) console.log("Connection closed: job already in progress");
         else console.log(`Connection closed: ${code}`);
     });
 });

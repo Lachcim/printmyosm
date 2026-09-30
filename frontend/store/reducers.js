@@ -106,17 +106,12 @@ export function reduceDestroyJob(state) {
     state.job = null;
 }
 
-export function reduceStartJob(state) {
+export function reduceSetJobState(state, action) {
     if (state.job != null)
-        state.job.state = "inProgress";
+        state.job.state = action.payload;
 }
 
 export function reduceSetRemainingTiles(state, action) {
     if (state.job != null)
         state.job.remainingTiles = action.payload;
-}
-
-export function reduceFinishJob(state) {
-    if (state.job != null)
-        state.job.state = "done";
 }
