@@ -321,14 +321,13 @@ app.get("/page/:zoom/:x/:y/:width/:height", async (req, res) => {
         }
     }
 
-    const output = await sharp(canvas, {
+    res.type("jpeg");
+
+    await sharp(canvas, {
         raw: {
             width: outputWidth,
             height: outputHeight,
             channels
         }
-    }).jpeg().toBuffer();
-
-    res.type("jpeg");
-    res.send(output);
+    }).jpeg().pipe(res);
 });
