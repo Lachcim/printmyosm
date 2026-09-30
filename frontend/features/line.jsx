@@ -12,7 +12,7 @@ const PolylineVector = memo(function PolylineVector({ id, points, color }) {
     const highlightedFeature = useSelector(state => state.toolbar.highlightedFeature);
 
     const style = {
-        weight: highlightedFeature == id ? 2 : 1,
+        weight: highlightedFeature == id ? 3 : 1,
         dashArray: [10, 5],
         color
     };

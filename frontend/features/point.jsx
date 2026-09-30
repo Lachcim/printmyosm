@@ -13,7 +13,7 @@ const PointVector = memo(function PointVector({ id, coordinates, color }) {
 
     const html = `
         <svg viewBox="-5 -5 10 10">
-            <path stroke="${color}" stroke-width="${highlightedFeature == id ? 2 : 1}" d="M -5 -5 L 5 5 M 5 -5 L -5 5"/>
+            <path stroke="${color}" stroke-width="${highlightedFeature == id ? 3 : 1}" d="M -5 -5 L 5 5 M 5 -5 L -5 5"/>
         </svg>
     `;
 
