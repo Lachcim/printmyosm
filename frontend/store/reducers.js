@@ -95,20 +95,28 @@ export function reduceSetGeometry(state, action) {
     state.map.geometry = action.payload;
 }
 
-export function reduceSetRemainingTiles(state, action) {
-    const remainingTiles = action.payload.remainingTiles;
-
-    if (!remainingTiles) {
-        state.job = null;
-    }
-
+export function reduceCreateJob(state) {
     state.job = {
-        status: action.payload.projected ? "notStarted" : "inProgress",
-        remainingTiles
+        state: "notStarted",
+        remainingTiles: null
     };
 }
 
-export function reduceJobFinished(state) {
+export function reduceDestroyJob(state) {
+    state.job = null;
+}
+
+export function reduceStartJob(state) {
     if (state.job != null)
-        state.job.status = "done";
+        state.job.state = "inProgress";
+}
+
+export function reduceSetRemainingTiles(state, action) {
+    if (state.job != null)
+        state.job.remainingTiles = action.payload;
+}
+
+export function reduceFinishJob(state) {
+    if (state.job != null)
+        state.job.state = "done";
 }

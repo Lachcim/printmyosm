@@ -3,7 +3,7 @@
     gap: 0.5rem;
 
     & > div {
-        flex-grow: 1;
+        flex: 1;
 
         .figure {
             font-size: 18pt;
@@ -11,8 +11,8 @@
         }
 
         &.downloaded {
-            width: 8rem;
-            flex-grow: 0;
+            white-space: nowrap;
+            text-align: right;
         }
     }
 }

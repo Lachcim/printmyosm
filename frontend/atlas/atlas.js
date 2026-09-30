@@ -1,6 +1,9 @@
 import Page from "./page";
 import { getBoundingBox, getMetersPerTile, latLongToTileXY, makePolygon } from "./geometry";
 
+import store from "../store/store";
+import { finishJob, setRemainingTiles, startJob } from "../store/actions";
+
 export class AtlasError extends Error {
     constructor(message, details) {
         super(message);
@@ -115,6 +118,7 @@ export default class Atlas {
             throw Error("Job already started");
 
         this.socket = new WebSocket("/");
+        store.dispatch(startJob());
 
         this.socket.addEventListener("open", () => {
             this.socket.send(
@@ -126,11 +130,13 @@ export default class Atlas {
         });
 
         this.socket.addEventListener("message", event => {
-            console.log("Message from server", event.data);
+            const { remainingTiles } = JSON.parse(event.data);
+            store.dispatch(setRemainingTiles(remainingTiles));
         });
 
-        this.socket.addEventListener("close", event => {
-            console.log("Closing", event.data);
+        this.socket.addEventListener("close", () => {
+            store.dispatch(finishJob());
+            this.socket = null;
         });
     }
 }

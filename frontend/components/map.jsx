@@ -7,7 +7,7 @@ import "../style/map";
 import { getFeatureFromJson, handleMapClick } from "../features/features";
 import { setZoomLevel, setTileSize } from "../store/actions";
 
-import { AtlasContext } from "../app";
+import { AtlasContext } from "../atlas/AtlasContextProvider";
 import { PageVector } from "../atlas/page";
 
 export const MapHoverContext = createContext(null);

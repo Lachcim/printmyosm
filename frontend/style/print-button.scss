@@ -1,0 +1,18 @@
+.print-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16pt;
+
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0.5em;
+
+    svg {
+        width: 1.2em;
+        height: 1.2em;
+
+        margin-right: 0.25rem;
+    }
+}

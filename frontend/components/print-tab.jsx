@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import AtlasStatistics from "./atlas-statistics";
 import Error from "./error";
 import GeometrySettings from "./geometry-settings";
+import PrintButton from "./print-button";
 import ToolbarTab from "./toolbar-tab";
 
 import Atlas, { AtlasError } from "../atlas/atlas";
-import { AtlasContext } from "../app";
+import { AtlasContext } from "../atlas/AtlasContextProvider";
 import { setRemainingTiles } from "../store/actions";
 
 export default function PrintTab() {
@@ -61,7 +62,7 @@ export default function PrintTab() {
             });
 
             const { remainingTiles } = await response.json();
-            dispatch(setRemainingTiles({ remainingTiles, projected: true }));
+            dispatch(setRemainingTiles(remainingTiles));
         };
 
         if (newAtlas) getRemainingTiles();
@@ -84,6 +85,9 @@ export default function PrintTab() {
                 atlasError && <Error heading={atlasError.message} text={atlasError.details}/>
             }
             <AtlasStatistics/>
+            <PrintButton
+                onStartJob={() => newAtlas.startJob()}
+            />
         </ToolbarTab>
     );
 }

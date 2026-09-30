@@ -204,7 +204,7 @@ wss.on("connection", ws => {
         }
 
         const { tiles, zoomLevel } = JSON.parse(data);
-        const tilesToDownload = getRemainingTiles(tiles, zoomLevel);
+        const tilesToDownload = await getRemainingTiles(tiles, zoomLevel);
 
         const requestedTiles = new Set(tiles).size;
         console.log(`Job started: requested ${requestedTiles} tiles, ${tilesToDownload.size} tiles remaining`);
