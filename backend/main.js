@@ -231,18 +231,25 @@ wss.on("connection", ws => {
 });
 
 app.get("/page/:zoom/:x/:y/:width/:height", async (req, res) => {
-    const { zoom, x: pageX, y: pageY, width, height } = req.params;
+    const { zoom, x: pageXRaw, y: pageYRaw, width: widthRaw, height: heightRaw } = req.params;
 
-    const minX = Math.floor(parseFloat(pageX));
-    const minY = Math.floor(parseFloat(pageY));
-    const maxX = Math.floor(parseFloat(pageX) + parseFloat(width));
-    const maxY = Math.floor(parseFloat(pageY) + parseFloat(height));
+    const pageX = parseFloat(pageXRaw);
+    const pageY = parseFloat(pageYRaw);
+    const width = parseFloat(widthRaw);
+    const height = parseFloat(heightRaw);
 
-    const tiles = [];
+    const endX = pageX + width;
+    const endY = pageY + height;
+    const minX = Math.floor(pageX);
+    const minY = Math.floor(pageY);
+    const maxX = Math.ceil(endX) - 1;
+    const maxY = Math.ceil(endY) - 1;
 
     let tileSize = null;
-    let offsetX = null;
-    let offsetY = null;
+    let skipPixelsStart = null;
+    let skipPixelsEnd = null;
+    let skipLinesStart = null;
+    let skipLinesEnd = null;
 
     for (let y = minY; y <= maxY; y++) {
         for (let x = minX; x <= maxX; x++) {
@@ -259,27 +266,69 @@ app.get("/page/:zoom/:x/:y/:width/:height", async (req, res) => {
                 const tileMetadata = await sampleTile.metadata();
 
                 tileSize = tileMetadata.width;
-                offsetX = Math.floor((pageX - minX) * tileSize);
-                offsetY = Math.floor((pageY - minY) * tileSize);
-            }
 
-            tiles.push({
-                input: tilePath,
-                left: (x - minX) * tileSize - offsetX,
-                top: (y - minY) * tileSize - offsetY
-            });
+                skipPixelsStart = Math.floor((pageX - minX) * tileSize);
+                skipPixelsEnd = Math.floor(((maxX + 1) - endX) * tileSize);
+                skipLinesStart = Math.floor((pageY - minY) * tileSize);
+                skipLinesEnd =  Math.floor(((maxY + 1) - endY) * tileSize);
+            }
         }
     }
 
-    const mapPage = await sharp({
-        create: {
-            width: Math.floor(width * tileSize),
-            height: Math.floor(height * tileSize),
-            channels: 3,
-            background: { r: 0, g: 0, b: 0 }
+    const channels = 3;
+    const outputWidth = (maxX - minX + 1) * tileSize - skipPixelsStart - skipPixelsEnd;
+    const outputHeight = (maxY - minY + 1) * tileSize - skipLinesStart - skipLinesEnd;
+
+    const keepPixelsEnd = tileSize - skipPixelsEnd;
+    const keepLinesEnd = tileSize - skipLinesEnd;
+
+    const canvas = Buffer.allocUnsafe(outputWidth * outputHeight * channels);
+    let canvasPosition = 0;
+
+    for (let y = minY; y <= maxY; y++) {
+        const tileBuffers = [];
+        const tileBufferPromises = [];
+
+        for (let x = minX; x <= maxX; x++) {
+            const readFile = async () => {
+                const tilePath = getTilePath(x, y, zoom);
+                const tile = await sharp(tilePath);
+                tileBuffers[x - minX] = await tile.raw().toBuffer();
+            };
+
+            tileBufferPromises.push(readFile());
         }
-    }).composite(tiles).jpeg().toBuffer();
+
+        await Promise.all(tileBufferPromises);
+
+        for (let line = 0; line < tileSize; line++) {
+            if (y == minY && line < skipLinesStart) continue;
+            if (y == maxY && line >= keepLinesEnd) continue;
+
+            for (let x = minX; x <= maxX; x++) {
+                const tileBuffer = tileBuffers[x - minX];
+
+                const tileStart = line * tileSize + ((x == minX) ? skipPixelsStart : 0);
+                const tileEnd = line * tileSize + ((x == maxX) ? keepPixelsEnd : tileSize);
+
+                canvasPosition += tileBuffer.copy(
+                    canvas,
+                    canvasPosition,
+                    tileStart * channels,
+                    tileEnd * channels
+                );
+            }
+        }
+    }
+
+    const output = await sharp(canvas, {
+        raw: {
+            width: outputWidth,
+            height: outputHeight,
+            channels
+        }
+    }).jpeg().toBuffer();
 
     res.type("jpeg");
-    res.send(mapPage);
+    res.send(output);
 });
