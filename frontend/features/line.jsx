@@ -1,8 +1,8 @@
-import React, { useContext, memo } from "react";
+import React, { memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CircleMarker, Polyline } from "react-leaflet";
 
-import { MapHoverContext } from "../components/map";
+import { useMapHover } from "../components/map";
 import Feature from "./feature";
 
 import store from "../store/store";
@@ -27,7 +27,7 @@ const PolylineVector = memo(function PolylineVector({ id, points, color }) {
 });
 
 function IncompletePolylineVector({ points, color }) {
-    const mousePosition = useContext(MapHoverContext);
+    const mousePosition = useMapHover();
     const dispatch = useDispatch();
 
     const getCompleteCircle = () => {

@@ -1,8 +1,8 @@
-import React, { useContext, memo } from "react";
+import React, { memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CircleMarker, Polygon as LeftletPolygon, Polyline } from "react-leaflet";
 
-import { MapHoverContext } from "../components/map";
+import { useMapHover } from "../components/map";
 import Feature from "./feature";
 
 import store from "../store/store";
@@ -31,7 +31,7 @@ const PolygonVector = memo(function PolygonVector({ id, points, color, heavy }) 
 });
 
 function IncompletePolygonVector({ points, color, heavy }) {
-    const mousePosition = useContext(MapHoverContext);
+    const mousePosition = useMapHover();
     const dispatch = useDispatch();
 
     const style = getStyle(color, heavy);

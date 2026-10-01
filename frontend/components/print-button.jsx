@@ -1,19 +1,19 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { PiDownloadSimpleLight, PiMapTrifoldLight, PiArrowClockwiseLight, PiPauseCircleLight } from "react-icons/pi";
 
 import Button from "./button";
 
 import "../style/print-button";
 
-export default function PrintButton({ onStartJob, onStopJob }) {
-    const job = useSelector(state => state.job);
-
-    if (!job)
+export default function PrintButton({ atlas }) {
+    if (!atlas)
         return null;
 
+    const remainingTiles = atlas.remaining?.tiles;
+    const remainingPages = atlas.remaining?.pages;
+
     const getButton = () => {
-        if (job.remainingTiles == 0) {
+        if (remainingTiles == 0 && remainingPages == 0) {
             return {
                 label: "Print map",
                 icon: <PiMapTrifoldLight />,
@@ -21,27 +21,27 @@ export default function PrintButton({ onStartJob, onStopJob }) {
             };
         }
 
-        if (job.state == "notStarted") {
+        if (atlas.jobState == "notStarted") {
             return {
-                label: "Download tiles",
+                label: remainingTiles == 0 ? "Download pages" : "Download tiles",
                 icon: <PiDownloadSimpleLight/>,
-                onClick: onStartJob
+                onClick: () => atlas.startJob()
             };
         }
 
-        if (job.state == "inProgress") {
+        if (atlas.jobState == "inProgress") {
             return {
-                label: "Pause",
+                label: remainingTiles == 0 ? "Downloading pages" : "Downloading tiles",
                 icon: <PiPauseCircleLight/>,
                 secondary: true,
-                onClick: onStopJob
+                onClick: () => atlas.stopJob()
             };
         }
 
         return {
             label: "Retry",
             icon: <PiArrowClockwiseLight/>,
-            onClick: onStartJob
+            onClick: () => atlas.startJob()
         };
     };
 

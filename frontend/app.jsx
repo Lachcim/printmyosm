@@ -2,7 +2,6 @@ import React from "react";
 import { Provider as StoreProvider } from "react-redux";
 
 import Atlas from "./components/atlas";
-import AtlasContextProvider from "./atlas/AtlasContextProvider";
 import Header from "./components/header";
 import MapWelcome from "./components/map-welcome";
 import Toolbar from "./components/toolbar";
@@ -14,14 +13,12 @@ import store from "./store/store";
 export default function App() {
     return (
         <StoreProvider store={store}>
-            <AtlasContextProvider>
-                <Header/>
-                <div className="map-toolbar">
-                    <MapWelcome/>
-                    <Toolbar/>
-                </div>
-                <Atlas/>
-            </AtlasContextProvider>
+            <Header/>
+            <div className="map-toolbar">
+                <MapWelcome/>
+                <Toolbar/>
+            </div>
+            <Atlas/>
         </StoreProvider>
     );
 }

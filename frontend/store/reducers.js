@@ -94,24 +94,3 @@ export function reduceHighlightFeature(state, action) {
 export function reduceSetGeometry(state, action) {
     state.map.geometry = action.payload;
 }
-
-export function reduceCreateJob(state) {
-    state.job = {
-        state: "notStarted",
-        remainingTiles: null
-    };
-}
-
-export function reduceDestroyJob(state) {
-    state.job = null;
-}
-
-export function reduceSetJobState(state, action) {
-    if (state.job != null)
-        state.job.state = action.payload;
-}
-
-export function reduceSetRemainingTiles(state, action) {
-    if (state.job != null)
-        state.job.remainingTiles = action.payload;
-}

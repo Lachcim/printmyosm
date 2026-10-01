@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
 
 import AtlasStatistics from "./atlas-statistics";
 import Error from "./error";
@@ -7,13 +7,11 @@ import GeometrySettings from "./geometry-settings";
 import PrintButton from "./print-button";
 import ToolbarTab from "./toolbar-tab";
 
+import useAtlas from "../atlas/use-atlas";
 import Atlas, { AtlasError } from "../atlas/atlas";
-import { AtlasContext } from "../atlas/AtlasContextProvider";
-import { setRemainingTiles } from "../store/actions";
 
 export default function PrintTab() {
-    const { setAtlas } = useContext(AtlasContext);
-    const dispatch = useDispatch(setRemainingTiles);
+    const { atlas, setAtlas } = useAtlas();
 
     const features = useSelector(state => state.map?.features);
     const geometry = useSelector(state => state.map?.geometry);
@@ -49,7 +47,7 @@ export default function PrintTab() {
     }, [setAtlas, newAtlas]);
 
     useEffect(() => {
-        const getRemainingTiles = async () => {
+        const getRemaining = async () => {
             const response = await fetch("/atlas", {
                 method: "post",
                 body: JSON.stringify({
@@ -61,12 +59,12 @@ export default function PrintTab() {
                 }
             });
 
-            const { remainingTiles } = await response.json();
-            dispatch(setRemainingTiles(remainingTiles));
+            const { remaining } = await response.json();
+            newAtlas.setRemaining(remaining);
         };
 
-        if (newAtlas) getRemainingTiles();
-    }, [newAtlas, dispatch]);
+        if (newAtlas) getRemaining();
+    }, [newAtlas]);
 
     return (
         <ToolbarTab>
@@ -85,10 +83,7 @@ export default function PrintTab() {
                 atlasError && <Error heading={atlasError.message} text={atlasError.details}/>
             }
             <AtlasStatistics/>
-            <PrintButton
-                onStartJob={() => newAtlas.startJob()}
-                onStopJob={() => newAtlas.stopJob()}
-            />
+            <PrintButton atlas={atlas}/>
         </ToolbarTab>
     );
 }

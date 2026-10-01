@@ -132,7 +132,12 @@ app.get("/tile/:zoom/:x/:y", async (req, res) => {
 
 app.post("/atlas", async (req, res) => {
     const tilesToDownload = await getRemainingTiles(req.body.tiles, req.body.zoomLevel);
-    res.json({ remainingTiles: tilesToDownload.size });
+
+    res.json({
+        remaining: {
+            tiles: tilesToDownload.size
+        }
+    });
 });
 
 wss.on("connection", ws => {
@@ -185,7 +190,7 @@ wss.on("connection", ws => {
             const inQueue = queue.size + queue.pending;
             console.log(`${inQueue} tiles remaining, ${failedTiles} tiles failed`);
 
-            ws.send(JSON.stringify({ remainingTiles: inQueue + failedTiles }));
+            ws.send(JSON.stringify({ remaining: { tiles: inQueue + failedTiles } }));
 
             if (inQueue == 0)
                 ws.close(1000);
@@ -196,7 +201,7 @@ wss.on("connection", ws => {
         });
 
         const jobSize = queue.size + queue.pending;
-        ws.send(JSON.stringify({ remainingTiles: jobSize }));
+        ws.send(JSON.stringify({ remaining: { tiles: jobSize } }));
 
         if (jobSize == 0)
             ws.close(1000);

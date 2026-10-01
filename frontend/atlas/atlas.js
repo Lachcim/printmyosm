@@ -1,9 +1,6 @@
 import Page from "./page";
 import { getBoundingBox, getMetersPerTile, latLongToTileXY, makePolygon } from "./geometry";
 
-import store from "../store/store";
-import { setJobState, setRemainingTiles } from "../store/actions";
-
 export class AtlasError extends Error {
     constructor(message, details) {
         super(message);
@@ -40,6 +37,10 @@ export default class Atlas {
         this.tiles = new Set();
         this.zoomLevel = geometry.zoomLevel;
         this.socket = null;
+
+        this.jobState = "notStarted";
+        this.remaining = null;
+        this.onChange = null;
 
         const printArea = printAreaLatLong.map(
             ([lat, long]) => latLongToTileXY(lat, long, this.zoomLevel)
@@ -133,7 +134,8 @@ export default class Atlas {
             throw Error("Job already started");
 
         this.socket = new WebSocket("/");
-        store.dispatch(setJobState("inProgress"));
+        this.jobState = "inProgress";
+        this.onChange?.();
 
         this.socket.addEventListener("open", () => {
             this.socket.send(
@@ -148,16 +150,18 @@ export default class Atlas {
             if (this.socket == null)
                 return;
 
-            const { remainingTiles } = JSON.parse(event.data);
-            store.dispatch(setRemainingTiles(remainingTiles));
+            const { remaining } = JSON.parse(event.data);
+            this.remaining = remaining;
+            this.onChange?.();
         });
 
         this.socket.addEventListener("close", () => {
             if (this.socket == null)
                 return;
 
-            store.dispatch(setJobState("done"));
             this.socket = null;
+            this.jobState = "done";
+            this.onChange?.();
         });
     }
 
@@ -167,7 +171,14 @@ export default class Atlas {
 
         this.socket.close(1000);
         this.socket = null;
-        store.dispatch(setJobState("notStarted"));
+
+        this.jobState = "notStarted";
+        this.onChange?.();
+    }
+
+    setRemaining(remaining) {
+        this.remaining = remaining;
+        this.onChange?.();
     }
 
     cleanUp() {

@@ -1,13 +1,12 @@
-import React, { useContext } from "react";
-import { useSelector } from "react-redux";
-
-import { AtlasContext } from "../atlas/AtlasContextProvider";
+import React from "react";
 
 import "../style/atlas-statistics";
 
+import useAtlas from "../atlas/use-atlas";
+
 export default function AtlasStatistics() {
-    const { atlas } = useContext(AtlasContext);
-    const remainingTiles = useSelector(state => state.job?.remainingTiles);
+    const { atlas } = useAtlas();
+    const remainingTiles = atlas?.remaining?.tiles;
 
     const getDownloadedTiles = () => {
         if (atlas == null || remainingTiles == null)

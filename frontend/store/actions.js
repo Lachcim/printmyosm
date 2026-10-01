@@ -14,7 +14,3 @@ export const printAreaStarted = createAction("printAreaStarted");
 export const removeFeature = createAction("removeFeature");
 export const highlightFeature = createAction("highlightFeature");
 export const setGeometry = createAction("setGeometry");
-export const createJob = createAction("createJob");
-export const destoryJob = createAction("destoryJob");
-export const setJobState = createAction("setJobState");
-export const setRemainingTiles = createAction("setRemainingTiles");

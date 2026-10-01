@@ -1,15 +1,13 @@
-import React, { useContext } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
 
 import AtlasPage from "./atlas-page";
 
-import { AtlasContext } from "../atlas/AtlasContextProvider";
+import useAtlas from "../atlas/use-atlas";
 
 export default function Atlas() {
-    const { atlas } = useContext(AtlasContext);
-    const remainingTiles = useSelector(state => state.job?.remainingTiles);
+    const { atlas } = useAtlas();
 
-    if (atlas == null || atlas.pages.length == 0 || remainingTiles != 0)
+    if (atlas == null || atlas.pages.length == 0 || atlas.remaining?.pages != 0)
         return;
 
     const { width, height } = atlas.pages[0].size.paper;

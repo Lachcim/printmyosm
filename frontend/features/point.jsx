@@ -1,7 +1,7 @@
-import React, { useContext, memo } from "react";
+import React, { memo } from "react";
 import { useSelector } from "react-redux";
 
-import { MapHoverContext } from "../components/map";
+import { useMapHover } from "../components/map";
 import DivMarker from "./div-marker";
 import Feature from "./feature";
 
@@ -28,7 +28,7 @@ const PointVector = memo(function PointVector({ id, coordinates, color }) {
 });
 
 function IncompletePointVector({ color }) {
-    const mousePosition = useContext(MapHoverContext);
+    const mousePosition = useMapHover();
 
     if (!mousePosition)
         return null;
