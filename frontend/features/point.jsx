@@ -43,6 +43,15 @@ function IncompletePointVector({ color }) {
     );
 }
 
+const PointSvgVector = memo(function PointVector({ coordinates, project, color }) {
+    const [lat, long] = coordinates;
+    const { x, y } = project(lat, long);
+
+    return (
+        <path stroke={color} d={`M ${x} ${y} m -5 -5 l 10 10 m -10 0 l 10 -10`}/>
+    );
+});
+
 export default class Point extends Feature {
     constructor(json) {
         super(json);
@@ -73,7 +82,18 @@ export default class Point extends Feature {
         return "red";
     }
 
-    render() {
+    render(project) {
+        if (project) {
+            return (
+                <PointSvgVector
+                    coordinates={this.coordinates}
+                    project={project}
+                    color={this.resolveColor()}
+                    key={this.id}
+                />
+            );
+        }
+
         if (this.incomplete) {
             return (
                 <IncompletePointVector

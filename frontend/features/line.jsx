@@ -63,6 +63,17 @@ function IncompletePolylineVector({ points, color }) {
     );
 }
 
+const PolylineSvgVector = memo(function PolylineSvgVector({ points, color, project }) {
+    const pathData = points.map(([lat, long], index) => {
+        const { x, y } = project(lat, long);
+        return `${index == 0 ? "M" : "L"} ${x} ${y}`;
+    });
+
+    return (
+        <path d={pathData} stroke={color} fill="none" strokeDasharray="10 5"/>
+    );
+});
+
 export default class Line extends Feature {
     constructor(json) {
         super(json);
@@ -92,7 +103,18 @@ export default class Line extends Feature {
         return "red";
     }
 
-    render() {
+    render(project) {
+        if (project) {
+            return (
+                <PolylineSvgVector
+                    points={this.points}
+                    project={project}
+                    color={this.resolveColor()}
+                    key={this.id}
+                />
+            );
+        }
+
         if (this.incomplete) {
             return (
                 <IncompletePolylineVector

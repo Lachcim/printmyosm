@@ -63,6 +63,23 @@ function IncompletePolygonVector({ points, color, heavy }) {
     );
 }
 
+const PolygonSvgVector = memo(function PolygonSvgVector({ points, project, color }) {
+    const polygonData = points.map(([lat, long]) => {
+        const { x, y } = project(lat, long);
+        return `${x},${y}`;
+    }).join(" ");
+
+    return (
+        <polygon
+            points={polygonData}
+            stroke={color}
+            fill={color}
+            fillOpacity="0.1"
+            strokeLinejoin="round"
+        />
+    );
+});
+
 export default class Polygon extends Feature {
     constructor(json) {
         super(json);
@@ -96,9 +113,20 @@ export default class Polygon extends Feature {
         return "orange";
     }
 
-    render() {
+    render(project) {
         const color = !this.heavy && { color: this.resolveColor() };
         const style = { heavy: this.heavy, ...color };
+
+        if (project) {
+            return (
+                <PolygonSvgVector
+                    points={this.points}
+                    project={project}
+                    key={this.id}
+                    {...style}
+                />
+            );
+        }
 
         if (this.incomplete) {
             return (

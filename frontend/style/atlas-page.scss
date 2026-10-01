@@ -9,6 +9,18 @@
     justify-content: center;
     align-items: center;
 
+    .printable {
+        position: relative;
+
+        & > * {
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+        }
+    }
+
     p {
         position: absolute;
 

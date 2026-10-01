@@ -29,4 +29,11 @@ export default class PrintArea extends Polygon {
     get defaultColor() {
         return null;
     }
+
+    render(project) {
+        if (project)
+            return;
+
+        return super.render();
+    }
 }
