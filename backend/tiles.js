@@ -1,5 +1,5 @@
 import path from "node:path";
-import { createWriteStream, existsSync } from "node:fs";
+import { createWriteStream } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { finished } from "node:stream/promises";
@@ -29,15 +29,6 @@ export async function downloadTile(x, y, zoom, tilePath, headers, signal) {
 
 export function getTilePath(x, y, zoom) {
     return path.join(tilesDir, `${zoom}-${x}-${y}.webp`);
-}
-
-export function getExistingTilePath(x, y, zoom) {
-    const tilePath = getTilePath(x, y, zoom);
-
-    if (existsSync(tilePath))
-        return tilePath;
-
-    return null;
 }
 
 function parseTileFilename(filename) {

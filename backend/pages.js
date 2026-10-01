@@ -1,7 +1,8 @@
 import path from "node:path";
+import { existsSync } from "node:fs";
 import sharp from "sharp";
 
-import { getExistingTilePath, getTilePath } from "./tiles.js";
+import { getTilePath } from "./tiles.js";
 
 const pagesDir = path.join(import.meta.dirname, "..", "tiles");
 
@@ -19,9 +20,9 @@ function getPagePath(map, pageCode) {
 function ensureTilesExist(zoom, minX, minY, maxX, maxY) {
     for (let y = minY; y <= maxY; y++) {
         for (let x = minX; x <= maxX; x++) {
-            const tilePath = getExistingTilePath(x, y, zoom);
+            const tilePath = getTilePath(x, y, zoom);
 
-            if (!tilePath) {
+            if (!existsSync(tilePath)) {
                 throw new PageIncompleteError(`Missing tile ${x} ${y}`);
             }
         }

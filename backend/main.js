@@ -1,11 +1,12 @@
 import express from "express";
 import { createServer } from "http";
+import { existsSync } from "fs";
 import { WebSocketServer } from "ws";
 import PQueue from "p-queue";
 import { makeRetriable } from "p-retry";
 
 import { getMaps, saveMaps } from "./maps.js";
-import { downloadTile, getExistingTilePath, getTilePath, getRemainingTiles } from "./tiles.js";
+import { downloadTile, getTilePath, getRemainingTiles } from "./tiles.js";
 import { composePage, PageIncompleteError } from "./pages.js";
 
 const app = express();
@@ -49,9 +50,9 @@ app.delete("/maps/:id", async (req, res) => {
 
 app.get("/tile/:zoom/:x/:y", async (req, res) => {
     const { zoom, x, y } = req.params;
-    const tilePath = getExistingTilePath(x, y, zoom);
+    const tilePath = getTilePath(x, y, zoom);
 
-    if (tilePath) {
+    if (existsSync(tilePath)) {
         res.sendFile(tilePath);
         return;
     }
