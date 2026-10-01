@@ -1,9 +1,9 @@
 import React from "react";
-import { PiDownloadSimpleLight, PiMapTrifoldLight, PiArrowClockwiseLight, PiPauseCircleLight } from "react-icons/pi";
-import { GiSewingNeedle } from "react-icons/gi";
+import { PiDownloadSimpleLight, PiMapTrifoldLight, PiArrowClockwiseLight } from "react-icons/pi";
 
 import AtlasView from "./atlas-view";
 import Button from "./button";
+import Spinner from "./spinner";
 
 import "../style/print-button";
 
@@ -23,7 +23,7 @@ export default function PrintButton({ atlas }) {
         if (atlas.jobState == "notStarted") {
             return {
                 label: readyTiles == atlas.tiles.size ? "Compose pages" : "Download tiles",
-                icon: readyTiles == atlas.tiles.size ? <GiSewingNeedle/> : <PiDownloadSimpleLight/>,
+                icon: <PiDownloadSimpleLight/>,
                 onClick: () => atlas.startJob()
             };
         }
@@ -31,7 +31,7 @@ export default function PrintButton({ atlas }) {
         if (atlas.jobState == "inProgress") {
             return {
                 label: readyTiles == atlas.tiles.size ? "Composing pages" : "Downloading tiles",
-                icon: <PiPauseCircleLight/>,
+                icon: <Spinner/>,
                 secondary: true,
                 onClick: () => atlas.stopJob()
             };

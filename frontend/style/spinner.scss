@@ -1,0 +1,11 @@
+svg.spinner {
+    width: 1em;
+    height: 1em;
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    animation: spin 0.5s infinite linear;
+}
