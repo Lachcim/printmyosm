@@ -2,11 +2,9 @@ import express from "express";
 import { createServer } from "http";
 import { existsSync } from "fs";
 import { WebSocketServer } from "ws";
-import PQueue from "p-queue";
-import { makeRetriable } from "p-retry";
 
 import { getMaps, saveMaps } from "./maps.js";
-import { downloadTile, getTilePath, getRemainingTiles } from "./tiles.js";
+import { downloadTile, getTilePath, getRemainingTiles, bulkDownloadTiles } from "./tiles.js";
 import { composePage, PageIncompleteError } from "./pages.js";
 
 const app = express();
@@ -96,69 +94,10 @@ app.get("/page/:map/:zoom/:x/:y/:width/:height", async (req, res) => {
 
 wss.on("connection", ws => {
     console.log("Connection received");
-    let abortJob = null;
-
-    function startJob(remainingTiles, totalTiles, zoomLevel) {
-        const controller = new AbortController();
-        const queue = new PQueue({
-            concurrency: 10,
-            intervalCap: 10,
-            interval: 1000,
-            strict: true
-        });
-        let failedTiles = 0;
-
-        for (const tile of remainingTiles) {
-            const [x, y] = tile.split("/").map(component => parseInt(component));
-
-            queue.add(
-                makeRetriable(
-                    async ({ signal }) => {
-                        const tilePath = getTilePath(x, y, zoomLevel);
-                        const response = await downloadTile(x, y, zoomLevel, tilePath, null, signal);
-
-                        if (response.status != 200)
-                            throw new Error("Failed to download tile");
-                    },
-                    {
-                        retries: 3,
-                        minTimeout: 3000,
-                        onFailedAttempt: ({ retriesLeft }) => {
-                            if (controller.signal.aborted) console.log(`Tile (${x}, ${y}) aborted`);
-                            else if (retriesLeft != 0) console.log(`Tile (${x}, ${y}) failed, will retry`);
-                            else console.log(`Tile (${x}, ${y}) failed`);
-                        },
-                        signal: controller.signal
-                    }
-                ),
-                {
-                    signal: controller.signal
-                }
-            ).catch(() => {});
-        }
-
-        queue.on("next", () => {
-            if (ws.readyState != WebSocket.OPEN)
-                return;
-
-            const inQueue = queue.size + queue.pending;
-            console.log(`Tile progress: ${totalTiles - inQueue}/${totalTiles}, ${failedTiles} tiles failed`);
-
-            ws.send(JSON.stringify({ tiles: totalTiles - inQueue, pages: [] }));
-
-            if (inQueue == 0)
-                ws.close(1000);
-        });
-
-        queue.on("error", () => {
-            failedTiles++;
-        });
-
-        return () => controller.abort();
-    }
+    let jobAbortController = null;
 
     ws.on("message", async data => {
-        if (abortJob) {
+        if (jobAbortController) {
             ws.close(4000);
             return;
         }
@@ -176,12 +115,37 @@ wss.on("connection", ws => {
 
         console.log(`Job started: requested ${totalTiles} tiles, ${remainingTiles.size} tiles remaining`);
 
-        abortJob = startJob(remainingTiles, totalTiles, zoomLevel);
+        jobAbortController = new AbortController();
+
+        await bulkDownloadTiles({
+            remainingTiles,
+            totalTiles,
+            zoomLevel,
+            abortSignal: jobAbortController.signal,
+            onNext: ({ totalTiles, inQueue, failedTiles }) => {
+                if (ws.readyState != WebSocket.OPEN)
+                    return;
+
+                console.log(`Tile progress: ${totalTiles - inQueue}/${totalTiles}, ${failedTiles} tiles failed`);
+                ws.send(JSON.stringify({ tiles: totalTiles - inQueue, pages: [] }));
+            },
+            onDone: () => {
+                if (ws.readyState != WebSocket.OPEN)
+                    return;
+
+                ws.close(1000);
+            },
+            onFailedAttempt: ({ x, y, aborted, retriesLeft }) => {
+                if (aborted) console.log(`Tile (${x}, ${y}) aborted`);
+                else if (retriesLeft != 0) console.log(`Tile (${x}, ${y}) failed, will retry`);
+                else console.log(`Tile (${x}, ${y}) failed`);
+            }
+        });
     });
 
     ws.on("close", code => {
-        if (abortJob) abortJob();
-        abortJob = null;
+        if (jobAbortController) jobAbortController.abort();
+        jobAbortController = null;
 
         if (code == 1000) console.log("Connection closed");
         else if (code == 1001) console.log("Connection closed: going away");
