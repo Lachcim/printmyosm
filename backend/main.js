@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 
 import { getMaps, saveMaps } from "./maps.js";
 import { downloadTile, getTilePath, getRemainingTiles, bulkDownloadTiles } from "./tiles.js";
-import { composePage, getPagePath, getRemainingPages } from "./pages.js";
+import { composePage, deleteOldPages, getPagePath, getRemainingPages } from "./pages.js";
 
 const app = express();
 const server = createServer(app);
@@ -143,6 +143,8 @@ wss.on("connection", ws => {
             ws.close(1000);
             return;
         }
+
+        deleteOldPages(map, pageCodes);
 
         for (const pageCode of remainingPages) {
             await composePage(map, pageCode);

@@ -17,6 +17,29 @@ function parsePageFilename(filename) {
     return rawName.replaceAll("_", "/");
 }
 
+export async function deleteOldPages(map, neededPageCodes) {
+    const neededPageCodesSet = new Set(neededPageCodes);
+
+    const mapDir = path.join(pagesDir, map);
+    if (!existsSync(mapDir))
+        return;
+
+    const filenames = await readdir(mapDir);
+
+    for (const filename of filenames) {
+        const presentPageCode = parsePageFilename(filename);
+
+        if (neededPageCodesSet.has(presentPageCode))
+            continue;
+
+        try {
+            unlinkSync(path.join(pagesDir, map, filename));
+            console.log(`Deleting old page ${presentPageCode}`);
+        }
+        catch {}
+    }
+}
+
 export async function getRemainingPages(map, pageCodes) {
     const remainingPages = new Set(pageCodes);
     const totalPages = remainingPages.size;
@@ -32,18 +55,8 @@ export async function getRemainingPages(map, pageCodes) {
     for (const filename of filenames) {
         const presentPageCode = parsePageFilename(filename);
 
-        if (!remainingPages.has(presentPageCode)) {
-            console.log(remainingPages, presentPageCode);
-            const filePath = path.join(pagesDir, map, filename);
-
-            try {
-                unlinkSync(filePath);
-                console.log(`Deleting old page ${presentPageCode}`);
-            }
-            catch {}
-
+        if (!remainingPages.has(presentPageCode))
             continue;
-        }
 
         remainingPages.delete(presentPageCode);
         donePages.push(presentPageCode);
