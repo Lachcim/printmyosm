@@ -66,17 +66,18 @@ async function getMaps() {
 }
 
 async function getRemainingTiles(tiles, zoomLevel) {
-    const output = new Set(tiles);
+    const remainingTiles = new Set(tiles);
+    const totalTiles = remainingTiles.size;
 
     const filenames = await readdir(tilesDir);
     for (const filename of filenames) {
         const presentTile = parseTileFilename(filename);
 
         if (presentTile.zoom == zoomLevel)
-            output.delete(`${presentTile.x}/${presentTile.y}`);
+            remainingTiles.delete(`${presentTile.x}/${presentTile.y}`);
     }
 
-    return output;
+    return { remainingTiles, totalTiles };
 }
 
 async function saveMaps(maps) {
@@ -131,12 +132,11 @@ app.get("/tile/:zoom/:x/:y", async (req, res) => {
 });
 
 app.post("/atlas", async (req, res) => {
-    const tilesToDownload = await getRemainingTiles(req.body.tiles, req.body.zoomLevel);
+    const { remainingTiles, totalTiles } = await getRemainingTiles(req.body.tiles, req.body.zoomLevel);
 
     res.json({
-        remaining: {
-            tiles: tilesToDownload.size
-        }
+        tiles: totalTiles - remainingTiles.size,
+        pages: []
     });
 });
 
@@ -144,7 +144,7 @@ wss.on("connection", ws => {
     console.log("Connection received");
     let abortJob = null;
 
-    function startJob(tilesToDownload, zoomLevel) {
+    function startJob(remainingTiles, totalTiles, zoomLevel) {
         const controller = new AbortController();
         const queue = new PQueue({
             concurrency: 10,
@@ -154,7 +154,7 @@ wss.on("connection", ws => {
         });
         let failedTiles = 0;
 
-        for (const tile of tilesToDownload) {
+        for (const tile of remainingTiles) {
             const [x, y] = tile.split("/").map(component => parseInt(component));
 
             queue.add(
@@ -188,9 +188,9 @@ wss.on("connection", ws => {
                 return;
 
             const inQueue = queue.size + queue.pending;
-            console.log(`${inQueue} tiles remaining, ${failedTiles} tiles failed`);
+            console.log(`Tile progress: ${totalTiles - inQueue}/${totalTiles}, ${failedTiles} tiles failed`);
 
-            ws.send(JSON.stringify({ remaining: { tiles: inQueue + failedTiles } }));
+            ws.send(JSON.stringify({ tiles: totalTiles - inQueue, pages: [] }));
 
             if (inQueue == 0)
                 ws.close(1000);
@@ -199,12 +199,6 @@ wss.on("connection", ws => {
         queue.on("error", () => {
             failedTiles++;
         });
-
-        const jobSize = queue.size + queue.pending;
-        ws.send(JSON.stringify({ remaining: { tiles: jobSize } }));
-
-        if (jobSize == 0)
-            ws.close(1000);
 
         return () => controller.abort();
     }
@@ -216,16 +210,23 @@ wss.on("connection", ws => {
         }
 
         const { tiles, zoomLevel } = JSON.parse(data);
-        const tilesToDownload = await getRemainingTiles(tiles, zoomLevel);
+        const { remainingTiles, totalTiles } = await getRemainingTiles(tiles, zoomLevel);
 
-        const requestedTiles = new Set(tiles).size;
-        console.log(`Job started: requested ${requestedTiles} tiles, ${tilesToDownload.size} tiles remaining`);
+        if (remainingTiles.size == 0) {
+            console.log(`Not starting job: ${totalTiles} tiles present`);
 
-        abortJob = startJob(tilesToDownload, zoomLevel);
+            ws.send(JSON.stringify({ tiles: totalTiles, pages: [] }));
+            ws.close(1000);
+            return;
+        }
+
+        console.log(`Job started: requested ${totalTiles} tiles, ${remainingTiles.size} tiles remaining`);
+
+        abortJob = startJob(remainingTiles, totalTiles, zoomLevel);
     });
 
     ws.on("close", code => {
-        abortJob();
+        if (abortJob) abortJob();
         abortJob = null;
 
         if (code == 1000) console.log("Connection closed");

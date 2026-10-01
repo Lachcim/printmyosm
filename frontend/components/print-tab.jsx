@@ -47,7 +47,7 @@ export default function PrintTab() {
     }, [setAtlas, newAtlas]);
 
     useEffect(() => {
-        const getRemaining = async () => {
+        const getAtlasProgress = async () => {
             const response = await fetch("/atlas", {
                 method: "post",
                 body: JSON.stringify({
@@ -59,11 +59,11 @@ export default function PrintTab() {
                 }
             });
 
-            const { remaining } = await response.json();
-            newAtlas.setRemaining(remaining);
+            const progress = await response.json();
+            newAtlas.setJobProgress(progress);
         };
 
-        if (newAtlas) getRemaining();
+        if (newAtlas) getAtlasProgress();
     }, [newAtlas]);
 
     return (
@@ -83,7 +83,9 @@ export default function PrintTab() {
                 atlasError && <Error heading={atlasError.message} text={atlasError.details}/>
             }
             <AtlasStatistics/>
-            <PrintButton atlas={atlas}/>
+            {
+                atlas && <PrintButton atlas={atlas} key={atlas.id}/>
+            }
         </ToolbarTab>
     );
 }

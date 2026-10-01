@@ -1,19 +1,18 @@
 import React from "react";
 import { PiDownloadSimpleLight, PiMapTrifoldLight, PiArrowClockwiseLight, PiPauseCircleLight } from "react-icons/pi";
+import { GiSewingNeedle } from "react-icons/gi";
 
+import AtlasView from "./atlas-view";
 import Button from "./button";
 
 import "../style/print-button";
 
 export default function PrintButton({ atlas }) {
-    if (!atlas)
-        return null;
-
-    const remainingTiles = atlas.remaining?.tiles;
-    const remainingPages = atlas.remaining?.pages;
+    const readyTiles = atlas.jobProgress?.tiles;
+    const readyPages = atlas.jobProgress?.pages.length;
 
     const getButton = () => {
-        if (remainingTiles == 0 && remainingPages == 0) {
+        if (readyTiles == atlas.tiles.size && readyPages == atlas.pages.length) {
             return {
                 label: "Print map",
                 icon: <PiMapTrifoldLight />,
@@ -23,15 +22,15 @@ export default function PrintButton({ atlas }) {
 
         if (atlas.jobState == "notStarted") {
             return {
-                label: remainingTiles == 0 ? "Download pages" : "Download tiles",
-                icon: <PiDownloadSimpleLight/>,
+                label: readyTiles == atlas.tiles.size ? "Compose pages" : "Download tiles",
+                icon: readyTiles == atlas.tiles.size ? <GiSewingNeedle/> : <PiDownloadSimpleLight/>,
                 onClick: () => atlas.startJob()
             };
         }
 
         if (atlas.jobState == "inProgress") {
             return {
-                label: remainingTiles == 0 ? "Downloading pages" : "Downloading tiles",
+                label: readyTiles == atlas.tiles.size ? "Composing pages" : "Downloading tiles",
                 icon: <PiPauseCircleLight/>,
                 secondary: true,
                 onClick: () => atlas.stopJob()
@@ -48,13 +47,16 @@ export default function PrintButton({ atlas }) {
     const { label, icon, secondary, onClick } = getButton();
 
     return (
-        <Button
-            className="print-button"
-            secondary={secondary}
-            onClick={onClick}
-        >
-            { icon }
-            { label }
-        </Button>
+        <>
+            <Button
+                className="print-button"
+                secondary={secondary}
+                onClick={onClick}
+            >
+                { icon }
+                { label }
+            </Button>
+            <AtlasView atlas={atlas}/>
+        </>
     );
 }

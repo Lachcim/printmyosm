@@ -6,14 +6,6 @@ import useAtlas from "../atlas/use-atlas";
 
 export default function AtlasStatistics() {
     const { atlas } = useAtlas();
-    const remainingTiles = atlas?.remaining?.tiles;
-
-    const getDownloadedTiles = () => {
-        if (atlas == null || remainingTiles == null)
-            return null;
-
-        return atlas.tiles.size - remainingTiles;
-    };
 
     return (
         <div className="atlas-statistics">
@@ -24,7 +16,7 @@ export default function AtlasStatistics() {
                 <span className="figure">{ atlas?.tiles.size ?? 0 }</span> tiles
             </div>
             <div className="downloaded">
-                <span className="figure">{ getDownloadedTiles() ?? "?" }</span> downloaded
+                <span className="figure">{ atlas?.jobProgress?.tiles ?? "?" }</span> downloaded
             </div>
         </div>
     );

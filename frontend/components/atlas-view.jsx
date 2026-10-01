@@ -1,19 +1,18 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
 import AtlasPage from "./atlas-page";
 
-import useAtlas from "../atlas/use-atlas";
+import "../style/atlas-view";
 
-export default function Atlas() {
-    const { atlas } = useAtlas();
-
-    if (atlas == null || atlas.pages.length == 0 || atlas.remaining?.pages != 0)
+export default function AtlasView({ atlas }) {
+    if (atlas == null || atlas.pages.length == 0 || atlas.jobProgress?.pages.length != atlas.pages.length)
         return;
 
     const { width, height } = atlas.pages[0].size.paper;
 
-    return (
-        <>
+    return createPortal(
+        <div className="atlas-view">
             <style>
                 {
                     `
@@ -25,6 +24,7 @@ export default function Atlas() {
                 }
             </style>
             { atlas.pages.map(page => <AtlasPage key={page.id} page={page}/>) }
-        </>
+        </div>,
+        document.body
     );
 }

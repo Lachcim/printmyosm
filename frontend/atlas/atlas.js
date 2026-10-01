@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import Page from "./page";
 import { getBoundingBox, getMetersPerTile, latLongToTileXY, makePolygon } from "./geometry";
 
@@ -33,13 +35,14 @@ export default class Atlas {
     ];
 
     constructor(printAreaLatLong, geometry) {
+        this.id = uuidv4();
         this.pages = [];
         this.tiles = new Set();
         this.zoomLevel = geometry.zoomLevel;
         this.socket = null;
 
         this.jobState = "notStarted";
-        this.remaining = null;
+        this.jobProgress = null;
         this.onChange = null;
 
         const printArea = printAreaLatLong.map(
@@ -150,8 +153,7 @@ export default class Atlas {
             if (this.socket == null)
                 return;
 
-            const { remaining } = JSON.parse(event.data);
-            this.remaining = remaining;
+            this.jobProgress = JSON.parse(event.data);
             this.onChange?.();
         });
 
@@ -176,8 +178,8 @@ export default class Atlas {
         this.onChange?.();
     }
 
-    setRemaining(remaining) {
-        this.remaining = remaining;
+    setJobProgress(progress) {
+        this.jobProgress = progress;
         this.onChange?.();
     }
 

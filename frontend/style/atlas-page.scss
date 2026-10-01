@@ -1,5 +1,5 @@
 .atlas-page {
-    display: none;
+    display: flex;
     position: relative;
 
     width: 100vw;
@@ -105,10 +105,4 @@
             font-size: 10pt;
         }
     }
-}
-
-@media print {
-    #root > .atlas-page {
-        display: flex;
-    };
 }
