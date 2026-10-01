@@ -77,6 +77,6 @@ export default class Page {
         const { x, y } = this.position;
         const { x: width, y: height } = this.size.tiles;
 
-        return `${x}/${y}/${width}/${height}`;
+        return `${this.zoomLevel}/${x}/${y}/${width}/${height}`;
     }
 }

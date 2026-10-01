@@ -48,11 +48,12 @@ const MapFeatures = memo(function MapFeatures({ page }) {
 });
 
 export default function AtlasPage({ page }) {
+    const mapId = useSelector(state => state.map?.id);
     const mapName = useSelector(state => state.map?.name);
     const scaleValue = useSelector(state => state.map?.geometry?.scale);
     const scale = Atlas.scales.find(scaleOption => scaleOption.value == scaleValue);
 
-    const pageSrc = `/page/${page.zoomLevel}/${page.position.x}/${page.position.y}/${page.size.tiles.x}/${page.size.tiles.y}`;
+    const pageSrc = `/page/${mapId}/${page.getCode()}`;
     const printableStyle = {
         width: `${page.size.printable.width}mm`,
         height: `${page.size.printable.height}mm`

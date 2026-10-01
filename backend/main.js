@@ -3,13 +3,10 @@ import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import PQueue from "p-queue";
 import { makeRetriable } from "p-retry";
-import sharp from "sharp";
 
-import path from "node:path";
-import { createWriteStream, existsSync } from "node:fs";
-import { readFile, writeFile, readdir } from "node:fs/promises";
-import { Readable } from "node:stream";
-import { finished } from "node:stream/promises";
+import { getMaps, saveMaps } from "./maps.js";
+import { downloadTile, getExistingTilePath, getTilePath, getRemainingTiles } from "./tiles.js";
+import { composePage, PageIncompleteError } from "./pages.js";
 
 const app = express();
 const server = createServer(app);
@@ -21,68 +18,6 @@ app.use(express.json());
 server.listen(8080, () => {
     console.log("PrintMyOSM listening at http://localhost:8080");
 });
-
-const mapsFile = path.join(import.meta.dirname, "..", "maps.json");
-const tilesDir = path.join(import.meta.dirname, "..", "tiles");
-
-async function downloadTile(x, y, zoom, tilePath, headers, signal) {
-    const url = `https://tile.tracestrack.com/topo__/${zoom}/${x}/${y}.webp?key=383118983d4a867dd2d367451720d724`;
-
-    const response = await fetch(url, {
-        method: "get",
-        headers: {
-            ...headers,
-            host: new URL(url).host,
-            referer: "https://www.openstreetmap.org/",
-        },
-        signal
-    });
-
-    if (response.status == 200) {
-        const stream = Readable.fromWeb(response.body);
-        await finished(stream.pipe(createWriteStream(tilePath)));
-    }
-
-    return response;
-}
-
-function getTilePath(x, y, zoom) {
-    return path.join(tilesDir, `${zoom}-${x}-${y}.webp`);
-}
-
-function parseTileFilename(filename) {
-    const rawName = path.parse(filename).name;
-    const components = rawName.split("-").map(component => parseInt(component));
-    return { zoom: components[0], x: components[1], y: components[2] };
-}
-
-async function getMaps() {
-    if (!existsSync(mapsFile)) {
-        return [];
-    }
-
-    const rawMaps = await readFile(mapsFile);
-    return JSON.parse(rawMaps);
-}
-
-async function getRemainingTiles(tiles, zoomLevel) {
-    const remainingTiles = new Set(tiles);
-    const totalTiles = remainingTiles.size;
-
-    const filenames = await readdir(tilesDir);
-    for (const filename of filenames) {
-        const presentTile = parseTileFilename(filename);
-
-        if (presentTile.zoom == zoomLevel)
-            remainingTiles.delete(`${presentTile.x}/${presentTile.y}`);
-    }
-
-    return { remainingTiles, totalTiles };
-}
-
-async function saveMaps(maps) {
-    await writeFile(mapsFile, JSON.stringify(maps));
-}
 
 app.get("/maps", async (req, res) => {
     const maps = await getMaps();
@@ -114,9 +49,9 @@ app.delete("/maps/:id", async (req, res) => {
 
 app.get("/tile/:zoom/:x/:y", async (req, res) => {
     const { zoom, x, y } = req.params;
-    const tilePath = getTilePath(x, y, zoom);
+    const tilePath = getExistingTilePath(x, y, zoom);
 
-    if (existsSync(tilePath)) {
+    if (tilePath) {
         res.sendFile(tilePath);
         return;
     }
@@ -138,6 +73,24 @@ app.post("/atlas", async (req, res) => {
         tiles: totalTiles - remainingTiles.size,
         pages: []
     });
+});
+
+app.get("/page/:map/:zoom/:x/:y/:width/:height", async (req, res) => {
+    const { map, zoom, x, y, width, height } = req.params;
+    const pageCode = `${zoom}/${x}/${y}/${width}/${height}`;
+
+    try {
+        res.sendFile(await composePage(map, pageCode));
+    }
+    catch (error) {
+        if (error instanceof PageIncompleteError) {
+            res.status(404);
+            res.send();
+            return;
+        }
+
+        throw error;
+    }
 });
 
 wss.on("connection", ws => {
@@ -234,106 +187,4 @@ wss.on("connection", ws => {
         else if (code == 4000) console.log("Connection closed: job already in progress");
         else console.log(`Connection closed: ${code}`);
     });
-});
-
-app.get("/page/:zoom/:x/:y/:width/:height", async (req, res) => {
-    const { zoom, x: pageXRaw, y: pageYRaw, width: widthRaw, height: heightRaw } = req.params;
-
-    const pageX = parseFloat(pageXRaw);
-    const pageY = parseFloat(pageYRaw);
-    const width = parseFloat(widthRaw);
-    const height = parseFloat(heightRaw);
-
-    const endX = pageX + width;
-    const endY = pageY + height;
-    const minX = Math.floor(pageX);
-    const minY = Math.floor(pageY);
-    const maxX = Math.ceil(endX) - 1;
-    const maxY = Math.ceil(endY) - 1;
-
-    let tileSize = null;
-    let skipPixelsStart = null;
-    let skipPixelsEnd = null;
-    let skipLinesStart = null;
-    let skipLinesEnd = null;
-
-    for (let y = minY; y <= maxY; y++) {
-        for (let x = minX; x <= maxX; x++) {
-            const tilePath = getTilePath(x, y, zoom);
-
-            if (!existsSync(tilePath)) {
-                res.status(404);
-                res.send();
-                return;
-            }
-
-            if (tileSize == null) {
-                const sampleTile = await sharp(tilePath);
-                const tileMetadata = await sampleTile.metadata();
-
-                tileSize = tileMetadata.width;
-
-                skipPixelsStart = Math.floor((pageX - minX) * tileSize);
-                skipPixelsEnd = Math.floor(((maxX + 1) - endX) * tileSize);
-                skipLinesStart = Math.floor((pageY - minY) * tileSize);
-                skipLinesEnd =  Math.floor(((maxY + 1) - endY) * tileSize);
-            }
-        }
-    }
-
-    const channels = 3;
-    const outputWidth = (maxX - minX + 1) * tileSize - skipPixelsStart - skipPixelsEnd;
-    const outputHeight = (maxY - minY + 1) * tileSize - skipLinesStart - skipLinesEnd;
-
-    const keepPixelsEnd = tileSize - skipPixelsEnd;
-    const keepLinesEnd = tileSize - skipLinesEnd;
-
-    const canvas = Buffer.allocUnsafe(outputWidth * outputHeight * channels);
-    let canvasPosition = 0;
-
-    for (let y = minY; y <= maxY; y++) {
-        const tileBuffers = [];
-        const tileBufferPromises = [];
-
-        for (let x = minX; x <= maxX; x++) {
-            const readFile = async () => {
-                const tilePath = getTilePath(x, y, zoom);
-                const tile = await sharp(tilePath);
-                tileBuffers[x - minX] = await tile.raw().toBuffer();
-            };
-
-            tileBufferPromises.push(readFile());
-        }
-
-        await Promise.all(tileBufferPromises);
-
-        for (let line = 0; line < tileSize; line++) {
-            if (y == minY && line < skipLinesStart) continue;
-            if (y == maxY && line >= keepLinesEnd) continue;
-
-            for (let x = minX; x <= maxX; x++) {
-                const tileBuffer = tileBuffers[x - minX];
-
-                const tileStart = line * tileSize + ((x == minX) ? skipPixelsStart : 0);
-                const tileEnd = line * tileSize + ((x == maxX) ? keepPixelsEnd : tileSize);
-
-                canvasPosition += tileBuffer.copy(
-                    canvas,
-                    canvasPosition,
-                    tileStart * channels,
-                    tileEnd * channels
-                );
-            }
-        }
-    }
-
-    res.type("jpeg");
-
-    await sharp(canvas, {
-        raw: {
-            width: outputWidth,
-            height: outputHeight,
-            channels
-        }
-    }).jpeg().pipe(res);
 });
