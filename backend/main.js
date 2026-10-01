@@ -147,7 +147,20 @@ wss.on("connection", ws => {
         deleteOldPages(map, pageCodes);
 
         for (const pageCode of remainingPages) {
-            await composePage(map, pageCode);
+            if (ws.readyState != WebSocket.OPEN)
+                return;
+
+            try {
+                await composePage(map, pageCode, jobAbortController.signal);
+            }
+            catch (error) {
+                if (error.name == "AbortError") {
+                    console.log("Page aborted");
+                    continue;
+                }
+
+                throw error;
+            }
 
             if (ws.readyState != WebSocket.OPEN)
                 return;

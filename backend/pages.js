@@ -102,7 +102,7 @@ async function loadTileLine(minX, maxX, y, zoom) {
     return tileBuffers;
 }
 
-export async function composePage(map, pageCode) {
+export async function composePage(map, pageCode, signal) {
     const [zoom, pageX, pageY, pageWidth, pageHeight] = pageCode.split("/").map(component => parseFloat(component));
 
     const endX = pageX + pageWidth;
@@ -132,6 +132,7 @@ export async function composePage(map, pageCode) {
 
     for (let y = minY; y <= maxY; y++) {
         const tileBuffers = await loadTileLine(minX, maxX, y, zoom);
+        signal.throwIfAborted();
 
         for (let line = 0; line < tileSize; line++) {
             if (y == minY && line < skipLinesStart) continue;
@@ -155,6 +156,7 @@ export async function composePage(map, pageCode) {
 
     const outputPath = getPagePath(map, pageCode);
 
+    signal.throwIfAborted();
     await sharp(canvas, {
         raw: {
             width: outputWidth,
