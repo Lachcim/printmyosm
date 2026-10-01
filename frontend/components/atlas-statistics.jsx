@@ -10,13 +10,10 @@ export default function AtlasStatistics() {
     return (
         <div className="atlas-statistics">
             <div>
-                <span className="figure">{ atlas?.pages.length ?? 0 }</span> pages
+                <span className="figure">{ atlas?.jobProgress?.pages.length ?? "?" }</span>/{ atlas?.pages.length ?? 0 } pages
             </div>
             <div>
-                <span className="figure">{ atlas?.tiles.size ?? 0 }</span> tiles
-            </div>
-            <div className="downloaded">
-                <span className="figure">{ atlas?.jobProgress?.tiles ?? "?" }</span> downloaded
+                <span className="figure">{ atlas?.jobProgress?.tiles ?? "?" }</span>/{ atlas?.tiles.size ?? 0 } tiles
             </div>
         </div>
     );
