@@ -13,6 +13,7 @@ import Atlas, { AtlasError } from "../atlas/atlas";
 export default function PrintTab() {
     const { atlas, setAtlas } = useAtlas();
 
+    const mapId = useSelector(state => state.map?.id);
     const features = useSelector(state => state.map?.features);
     const geometry = useSelector(state => state.map?.geometry);
 
@@ -29,7 +30,7 @@ export default function PrintTab() {
         }
 
         try {
-            const newAtlas = new Atlas(printArea.points, geometry);
+            const newAtlas = new Atlas(mapId, printArea.points, geometry);
             return { newAtlas, atlasError: null };
         }
         catch (error) {
@@ -39,7 +40,7 @@ export default function PrintTab() {
 
             throw error;
         }
-    }, [geometry, geometryComplete, printArea]);
+    }, [mapId, geometry, geometryComplete, printArea]);
 
     useEffect(() => {
         setAtlas(newAtlas);
@@ -51,8 +52,10 @@ export default function PrintTab() {
             const response = await fetch("/atlas", {
                 method: "post",
                 body: JSON.stringify({
+                    map: newAtlas.mapId,
                     zoomLevel: newAtlas.zoomLevel,
-                    tiles: Array.from(newAtlas.tiles)
+                    tiles: Array.from(newAtlas.tiles),
+                    pages: newAtlas.pages.map(page => page.getCode())
                 }),
                 headers: {
                     "Content-Type": "application/json"

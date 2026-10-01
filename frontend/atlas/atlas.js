@@ -34,8 +34,9 @@ export default class Atlas {
         { value: 500000, label: "1:500 000", description: "1 cm = 5 km" },
     ];
 
-    constructor(printAreaLatLong, geometry) {
+    constructor(mapId, printAreaLatLong, geometry) {
         this.id = uuidv4();
+        this.mapId = mapId;
         this.pages = [];
         this.tiles = new Set();
         this.zoomLevel = geometry.zoomLevel;
