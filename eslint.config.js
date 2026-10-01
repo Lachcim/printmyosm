@@ -48,6 +48,7 @@ export default defineConfig([
             }],
             quotes: ["error", "double"],
             semi: ["error", "always"],
+            "no-empty": ["error", { "allowEmptyCatch": true }],
             "array-bracket-spacing": ["error", "never"],
             "object-curly-spacing": ["error", "always"],
             "no-constant-condition": ["error", {

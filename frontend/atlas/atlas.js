@@ -144,8 +144,10 @@ export default class Atlas {
         this.socket.addEventListener("open", () => {
             this.socket.send(
                 JSON.stringify({
+                    map: this.mapId,
                     zoomLevel: this.zoomLevel,
-                    tiles: Array.from(this.tiles)
+                    tiles: Array.from(this.tiles),
+                    pageCodes: this.pages.map(page => page.getCode())
                 })
             );
         });

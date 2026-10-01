@@ -79,7 +79,7 @@ function bulkDownloadTilesInternal({ remainingTiles, totalTiles, zoomLevel, abor
                 {
                     retries: 3,
                     minTimeout: 3000,
-                    onFailedAttempt: ({ ...args }) => onFailedAttempt({ ...args, aborted: abortSignal.aborted, x, y }),
+                    onFailedAttempt: ({ ...args }) => onFailedAttempt({ ...args, x, y }),
                     signal: abortSignal
                 }
             ),
@@ -102,13 +102,17 @@ function bulkDownloadTilesInternal({ remainingTiles, totalTiles, zoomLevel, abor
     });
 }
 
-export function bulkDownloadTiles({ onDone, ...args }) {
+export function bulkDownloadTiles({ remainingTiles, ...args }) {
     return new Promise(resolve => {
-        const handleDone = (...doneArgs) => {
-            onDone(...doneArgs);
-            resolve();
-        };
+        if (remainingTiles.size == 0) {
+            resolve(true);
+            return;
+        }
 
-        bulkDownloadTilesInternal({ onDone: handleDone, ...args });
+        bulkDownloadTilesInternal({
+            remainingTiles,
+            onDone: resolve,
+            ...args
+        });
     });
 }

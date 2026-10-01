@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 
 import { getMaps, saveMaps } from "./maps.js";
 import { downloadTile, getTilePath, getRemainingTiles, bulkDownloadTiles } from "./tiles.js";
-import { composePage, PageIncompleteError } from "./pages.js";
+import { composePage, getPagePath, getRemainingPages } from "./pages.js";
 
 const app = express();
 const server = createServer(app);
@@ -66,11 +66,14 @@ app.get("/tile/:zoom/:x/:y", async (req, res) => {
 });
 
 app.post("/atlas", async (req, res) => {
-    const { remainingTiles, totalTiles } = await getRemainingTiles(req.body.tiles, req.body.zoomLevel);
+    const { tiles, zoomLevel, map, pageCodes } = req.body;
+
+    const { remainingTiles, totalTiles } = await getRemainingTiles(tiles, zoomLevel);
+    const { donePages } = await getRemainingPages(map, pageCodes);
 
     res.json({
         tiles: totalTiles - remainingTiles.size,
-        pages: []
+        pages: donePages
     });
 });
 
@@ -78,18 +81,15 @@ app.get("/page/:map/:zoom/:x/:y/:width/:height", async (req, res) => {
     const { map, zoom, x, y, width, height } = req.params;
     const pageCode = `${zoom}/${x}/${y}/${width}/${height}`;
 
-    try {
-        res.sendFile(await composePage(map, pageCode));
-    }
-    catch (error) {
-        if (error instanceof PageIncompleteError) {
-            res.status(404);
-            res.send();
-            return;
-        }
+    const pagePath = getPagePath(map, pageCode);
 
-        throw error;
+    if (!existsSync(pagePath)) {
+        res.status(404);
+        res.send();
+        return;
     }
+
+    res.sendFile(pagePath);
 });
 
 wss.on("connection", ws => {
@@ -102,22 +102,22 @@ wss.on("connection", ws => {
             return;
         }
 
-        const { tiles, zoomLevel } = JSON.parse(data);
+        const { tiles, zoomLevel, map, pageCodes } = JSON.parse(data);
         const { remainingTiles, totalTiles } = await getRemainingTiles(tiles, zoomLevel);
+        const { remainingPages, donePages, totalPages } = await getRemainingPages(map, pageCodes);
 
-        if (remainingTiles.size == 0) {
-            console.log(`Not starting job: ${totalTiles} tiles present`);
+        if (remainingTiles.size == 0 && remainingPages.size == 0) {
+            console.log(`Not starting job: ${totalTiles} tiles and ${donePages.length} present`);
 
-            ws.send(JSON.stringify({ tiles: totalTiles, pages: [] }));
+            ws.send(JSON.stringify({ tiles: totalTiles, pages: donePages }));
             ws.close(1000);
             return;
         }
 
-        console.log(`Job started: requested ${totalTiles} tiles, ${remainingTiles.size} tiles remaining`);
-
+        console.log(`Job started: ${remainingTiles.size} tiles and ${remainingPages.size} pages remaining`);
         jobAbortController = new AbortController();
 
-        await bulkDownloadTiles({
+        const tilesDownloaded = await bulkDownloadTiles({
             remainingTiles,
             totalTiles,
             zoomLevel,
@@ -127,20 +127,36 @@ wss.on("connection", ws => {
                     return;
 
                 console.log(`Tile progress: ${totalTiles - inQueue}/${totalTiles}, ${failedTiles} tiles failed`);
-                ws.send(JSON.stringify({ tiles: totalTiles - inQueue, pages: [] }));
+                ws.send(JSON.stringify({ tiles: totalTiles - inQueue, pages: donePages }));
             },
-            onDone: () => {
-                if (ws.readyState != WebSocket.OPEN)
-                    return;
-
-                ws.close(1000);
-            },
-            onFailedAttempt: ({ x, y, aborted, retriesLeft }) => {
-                if (aborted) console.log(`Tile (${x}, ${y}) aborted`);
+            onFailedAttempt: ({ x, y, retriesLeft }) => {
+                if (jobAbortController.signal.aborted) console.log(`Tile (${x}, ${y}) aborted`);
                 else if (retriesLeft != 0) console.log(`Tile (${x}, ${y}) failed, will retry`);
                 else console.log(`Tile (${x}, ${y}) failed`);
             }
         });
+
+        if (ws.readyState != WebSocket.OPEN)
+            return;
+
+        if (!tilesDownloaded) {
+            ws.close(1000);
+            return;
+        }
+
+        for (const pageCode of remainingPages) {
+            await composePage(map, pageCode);
+
+            if (ws.readyState != WebSocket.OPEN)
+                return;
+
+            donePages.push(pageCode);
+
+            console.log(`Page progress: ${donePages.length}/${totalPages}`);
+            ws.send(JSON.stringify({ tiles: totalTiles, pages: donePages }));
+        }
+
+        ws.close(1000);
     });
 
     ws.on("close", code => {

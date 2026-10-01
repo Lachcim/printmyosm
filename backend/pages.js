@@ -1,21 +1,54 @@
 import path from "node:path";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, unlinkSync } from "node:fs";
+import { readdir } from "node:fs/promises";
 import sharp from "sharp";
 
 import { getTilePath } from "./tiles.js";
 
 const pagesDir = path.join(import.meta.dirname, "..", "pages");
 
-export class PageIncompleteError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = "PageIncompleteError";
-    }
-}
-
-function getPagePath(map, pageCode) {
+export function getPagePath(map, pageCode) {
     mkdirSync(path.join(pagesDir, map), { recursive: true });
     return path.join(pagesDir, map, `${pageCode.replaceAll("/", "_")}.jpg`);
+}
+
+function parsePageFilename(filename) {
+    const rawName = path.parse(filename).name;
+    return rawName.replaceAll("_", "/");
+}
+
+export async function getRemainingPages(map, pageCodes) {
+    const remainingPages = new Set(pageCodes);
+    const totalPages = remainingPages.size;
+    const donePages = [];
+
+    const mapDir = path.join(pagesDir, map);
+    if (!existsSync(mapDir)) {
+        return { remainingPages, totalPages, donePages };
+    }
+
+    const filenames = await readdir(mapDir);
+
+    for (const filename of filenames) {
+        const presentPageCode = parsePageFilename(filename);
+
+        if (!remainingPages.has(presentPageCode)) {
+            const filePath = path.join(pagesDir, map, filename);
+
+            try {
+                unlinkSync(filePath);
+                console.log(`Deleting old page ${presentPageCode}`);
+            }
+            catch {}
+
+            continue;
+        }
+
+        remainingPages.delete(presentPageCode);
+        donePages.push(presentPageCode);
+    }
+
+    return { remainingPages, totalPages, donePages };
 }
 
 function ensureTilesExist(zoom, minX, minY, maxX, maxY) {
@@ -24,7 +57,7 @@ function ensureTilesExist(zoom, minX, minY, maxX, maxY) {
             const tilePath = getTilePath(x, y, zoom);
 
             if (!existsSync(tilePath)) {
-                throw new PageIncompleteError(`Missing tile ${x} ${y}`);
+                throw new Error(`Missing tile ${x} ${y}`);
             }
         }
     }
@@ -115,6 +148,4 @@ export async function composePage(map, pageCode) {
             channels
         }
     }).jpeg().toFile(outputPath);
-
-    return outputPath;
 }
