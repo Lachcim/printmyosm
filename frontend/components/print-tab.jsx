@@ -55,7 +55,7 @@ export default function PrintTab() {
                     map: newAtlas.mapId,
                     zoomLevel: newAtlas.zoomLevel,
                     tiles: Array.from(newAtlas.tiles),
-                    pages: newAtlas.pages.map(page => page.getCode())
+                    pageCodes: newAtlas.pages.map(page => page.getCode())
                 }),
                 headers: {
                     "Content-Type": "application/json"

@@ -33,6 +33,7 @@ export async function getRemainingPages(map, pageCodes) {
         const presentPageCode = parsePageFilename(filename);
 
         if (!remainingPages.has(presentPageCode)) {
+            console.log(remainingPages, presentPageCode);
             const filePath = path.join(pagesDir, map, filename);
 
             try {
