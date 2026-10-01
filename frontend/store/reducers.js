@@ -12,7 +12,7 @@ export function reduceCreateNewMap(state) {
             scale: null,
             paperSize: null,
             landscape: false,
-            borderless: false
+            margins: 12
         }
     };
 }

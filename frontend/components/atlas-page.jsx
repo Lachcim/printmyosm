@@ -54,9 +54,18 @@ export default function AtlasPage({ page, onLoad }) {
     const scale = Atlas.scales.find(scaleOption => scaleOption.value == scaleValue);
 
     const pageSrc = `/page/${mapId}/${page.getCode()}`;
+
+    const spineMargin = `${page.size.printable.spineMargin}mm`;
+    const landscape = page.size.printable.width > page.size.printable.height;
+    const even = page.number % 2 == 0;
+
     const printableStyle = {
         width: `${page.size.printable.width}mm`,
-        height: `${page.size.printable.height}mm`
+        height: `${page.size.printable.height}mm`,
+        marginTop: landscape && !even && spineMargin || 0,
+        marginLeft: !landscape && !even && spineMargin || 0,
+        marginBottom: landscape && even && spineMargin || 0,
+        marginRight: !landscape && even && spineMargin || 0
     };
 
     const directions = ["top", "left", "bottom", "right"];
@@ -68,7 +77,7 @@ export default function AtlasPage({ page, onLoad }) {
                 <MapFeatures page={page}/>
             </div>
 
-            <p className={`page-number ${page.number % 2 == 0 ? "even" : "odd"}`}>{ page.number }</p>
+            <p className={`page-number ${even ? "even" : "odd"}`}>{ page.number }</p>
 
             {
                 page.number == 1 && <p className="map-name">{ mapName }</p>

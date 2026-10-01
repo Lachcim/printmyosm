@@ -17,16 +17,12 @@ export default function GeometrySettings() {
         { value: false, label: "Portrait" },
         { value: true, label: "Landscape" }
     ];
-    const marginSettings = [
-        { value: false, label: "Standard" },
-        { value: true, label: "No margins" }
-    ];
 
     const setScale = scale => dispatch(setGeometry({ ...geometry, scale }));
     const setZoomLevel = zoomLevel => dispatch(setGeometry({ ...geometry, zoomLevel }));
     const setPaperSize = paperSize => dispatch(setGeometry({ ...geometry, paperSize }));
     const setLandscape = landscape => dispatch(setGeometry({ ...geometry, landscape }));
-    const setBorderless = borderless => dispatch(setGeometry({ ...geometry, borderless }));
+    const setMargins = margins => dispatch(setGeometry({ ...geometry, margins }));
 
     return (
         <div className="geometry-settings">
@@ -48,7 +44,7 @@ export default function GeometrySettings() {
             </div>
             <div>
                 <h3>Margins</h3>
-                <Dropdown items={marginSettings} value={geometry.borderless} onValueChange={setBorderless}/>
+                <Dropdown items={Atlas.margins} value={geometry.margins} onValueChange={setMargins}/>
             </div>
         </div>
     );

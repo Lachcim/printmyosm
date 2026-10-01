@@ -34,6 +34,13 @@ export default class Atlas {
         { value: 500000, label: "1:500 000", description: "1 cm = 5 km" },
     ];
 
+    static margins = [
+        { value: 0, label: "No margins", description: "0 mm" },
+        { value: 7, label: "Minimal", description: "7 mm" },
+        { value: 12, label: "Narrow", description: "12 mm" },
+        { value: 20, label: "Full", description: "20 mm" }
+    ];
+
     constructor(mapId, printAreaLatLong, geometry) {
         this.id = uuidv4();
         this.mapId = mapId;
@@ -107,15 +114,20 @@ export default class Atlas {
         const paperWidth = geometry.landscape ? paperData.height : paperData.width;
         const paperHeight = geometry.landscape ? paperData.width : paperData.height;
 
-        const margin = geometry.borderless ? 0 : 10;
+        const baseMargin = geometry.margins;
+        const spineMargin = geometry.margins > 0 ? (20 - baseMargin) : 0;
+        const spineMarginX = geometry.landscape ? 0 : spineMargin;
+        const spineMarginY = geometry.landscape ? spineMargin : 0;
+
         const output = {
             paper: {
                 width: paperWidth,
                 height: paperHeight
             },
             printable: {
-                width: paperWidth - margin * 2,
-                height: paperHeight - margin * 2
+                width: paperWidth - baseMargin * 2 - spineMarginX,
+                height: paperHeight - baseMargin * 2 - spineMarginY,
+                spineMargin
             }
         };
 
