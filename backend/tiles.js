@@ -1,5 +1,5 @@
 import path from "node:path";
-import { createWriteStream } from "node:fs";
+import { createWriteStream, mkdirSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { finished } from "node:stream/promises";
@@ -28,6 +28,7 @@ export async function downloadTile(x, y, zoom, tilePath, headers, signal) {
 }
 
 export function getTilePath(x, y, zoom) {
+    mkdirSync(tilesDir, { recursive: true });
     return path.join(tilesDir, `${zoom}-${x}-${y}.webp`);
 }
 

@@ -1,10 +1,10 @@
 import path from "node:path";
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import sharp from "sharp";
 
 import { getTilePath } from "./tiles.js";
 
-const pagesDir = path.join(import.meta.dirname, "..", "tiles");
+const pagesDir = path.join(import.meta.dirname, "..", "pages");
 
 export class PageIncompleteError extends Error {
     constructor(message) {
@@ -14,7 +14,8 @@ export class PageIncompleteError extends Error {
 }
 
 function getPagePath(map, pageCode) {
-    return path.join(pagesDir, `${pageCode.replaceAll("/", "_")}.jpg`);
+    mkdirSync(path.join(pagesDir, map), { recursive: true });
+    return path.join(pagesDir, map, `${pageCode.replaceAll("/", "_")}.jpg`);
 }
 
 function ensureTilesExist(zoom, minX, minY, maxX, maxY) {
