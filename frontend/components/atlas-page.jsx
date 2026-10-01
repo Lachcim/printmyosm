@@ -47,7 +47,7 @@ const MapFeatures = memo(function MapFeatures({ page }) {
     );
 });
 
-export default function AtlasPage({ page }) {
+export default function AtlasPage({ page, onLoad }) {
     const mapId = useSelector(state => state.map?.id);
     const mapName = useSelector(state => state.map?.name);
     const scaleValue = useSelector(state => state.map?.geometry?.scale);
@@ -64,7 +64,7 @@ export default function AtlasPage({ page }) {
     return (
         <section className="atlas-page">
             <div className="printable" style={printableStyle}>
-                <img src={pageSrc}/>
+                <img src={pageSrc} onLoad={() => onLoad(page.id)}/>
                 <MapFeatures page={page}/>
             </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { PiDownloadSimpleLight, PiMapTrifoldLight, PiArrowClockwiseLight } from "react-icons/pi";
 
 import AtlasView from "./atlas-view";
@@ -8,11 +8,21 @@ import Spinner from "./spinner";
 import "../style/print-button";
 
 export default function PrintButton({ atlas }) {
+    const [atlasViewReady, setAtlasViewReady] = useState(false);
+
     const readyTiles = atlas.jobProgress?.tiles;
     const readyPages = atlas.jobProgress?.pages.length;
 
     const getButton = () => {
         if (readyTiles == atlas.tiles.size && readyPages == atlas.pages.length) {
+            if (!atlasViewReady) {
+                return {
+                    label: "Downloading pages",
+                    icon: <Spinner/>,
+                    secondary: true
+                };
+            }
+
             return {
                 label: "Print map",
                 icon: <PiMapTrifoldLight />,
@@ -56,7 +66,7 @@ export default function PrintButton({ atlas }) {
                 { icon }
                 { label }
             </Button>
-            <AtlasView atlas={atlas}/>
+            <AtlasView atlas={atlas} onReady={() => setAtlasViewReady(true)}/>
         </>
     );
 }
