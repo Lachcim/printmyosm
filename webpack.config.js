@@ -4,7 +4,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 const src = path.resolve(import.meta.dirname, "frontend");
 const dist = path.resolve(import.meta.dirname, "dist");
 
-export default {
+export default (env, argv) => ({
     entry: "./main.jsx",
     context: src,
     target: "web",
@@ -21,6 +21,7 @@ export default {
                 use: {
                     loader: "babel-loader",
                     options: {
+                        envName: argv.mode,
                         presets: ["@babel/preset-react"]
                     }
                 },
@@ -55,5 +56,9 @@ export default {
     experiments: {
         outputModule: true
     },
-    externalsType: "module"
-};
+    externalsType: "module",
+    performance: {
+        maxAssetSize: 600000,
+        maxEntrypointSize: 600000,
+    }
+});

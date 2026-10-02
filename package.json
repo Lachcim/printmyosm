@@ -16,7 +16,8 @@
     "watch-backend": "node --watch backend/main.js",
     "lint": "eslint --fix frontend backend *.config.js",
     "lint-check": "eslint frontend backend *.config.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "printmyosm": "webpack --mode=production && node backend/main.js"
   },
   "devDependencies": {
     "@babel/core": "^8.0.6",
