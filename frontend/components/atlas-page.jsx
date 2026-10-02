@@ -59,11 +59,13 @@ export default function AtlasPage({ page, onLoad }) {
     const landscape = page.size.printable.width > page.size.printable.height;
     const even = page.number % 2 == 0;
     const internal = page.size.printable.baseMargin < 10;
+    const full = page.size.printable.baseMargin >= 20;
 
     const evenOdd = even ? "even" : "odd";
     const landscapePotrait = landscape ? "landscape" : "portrait";
     const internalExternal = internal ? "internal" : "external";
-    const variant = `${evenOdd} ${landscapePotrait} ${internalExternal}`;
+    const fullCompact = full ? "full" : "compact";
+    const variant = `${evenOdd} ${landscapePotrait} ${internalExternal} ${fullCompact}`;
 
     const printableStyle = {
         width: `${page.size.printable.width}mm`,

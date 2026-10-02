@@ -24,14 +24,21 @@
         p {
             position: absolute;
 
-            padding-block: 0.5rem;
+            padding-block: 0.3em;
             margin: 0;
 
             &.internal {
-                padding-inline: 0.5rem;
+                padding-inline: 0.3em;
+            }
+            &.compact {
+                font-size: 8pt;
             }
 
             &.map-name, &.credits {
+                &.compact {
+                    font-size: 12pt;
+                }
+
                 &.portrait {
                     writing-mode: sideways-lr;
 
@@ -77,16 +84,16 @@
 
                     &.even {
                         text-align: left;
-                        margin-left: 1cm;
+                        margin-left: 2.1em;
                     }
                     &.odd {
                         text-align: right;
-                        margin-right: 1cm;
+                        margin-right: 2.1em;
                     }
                 }
             }
             &.page-number {
-                width: 1cm;
+                width: 2.1em;
                 text-align: center;
                 font-weight: 400;
 
