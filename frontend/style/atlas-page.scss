@@ -31,22 +31,30 @@
                 padding-inline: 0.5rem;
             }
 
+            &.map-name, &.credits {
+                &.portrait {
+                    writing-mode: sideways-lr;
+
+                    top: 0;
+                    bottom: 0;
+
+                    &.internal { left: 0; }
+                    &.external { right: 100%; }
+                }
+
+                &.landscape {
+                    left: 0;
+                    right: 0;
+
+                    &.internal { top: 0; }
+                    &.external { bottom: 100%; }
+                }
+            }
             &.map-name {
                 font-weight: 400;
-
-                left: 0;
-                right: 0;
-
-                &.internal { top: 0; }
-                &.external { bottom: 100%; }
             }
             &.credits {
-                left: 0;
-                right: 0;
                 text-align: right;
-
-                &.internal { top: 0; }
-                &.external { bottom: 100%; }
             }
             &.scale {
                 left: 0;
