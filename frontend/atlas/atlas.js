@@ -127,6 +127,7 @@ export default class Atlas {
             printable: {
                 width: paperWidth - baseMargin * 2 - spineMarginX,
                 height: paperHeight - baseMargin * 2 - spineMarginY,
+                baseMargin,
                 spineMargin
             }
         };

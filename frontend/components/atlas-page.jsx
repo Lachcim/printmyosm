@@ -13,9 +13,9 @@ import Atlas from "../atlas/atlas";
 import { getFeatureFromJson } from "../features/features";
 import { latLongToTileXY } from "../atlas/geometry";
 
-function NeighborMark({ direction, page }) {
+function NeighborMark({ direction, variant, page }) {
     return (
-        <p className={`neighbor ${direction}`}>
+        <p className={`neighbor ${direction} ${variant}`}>
             { direction == "top" && <PiArrowUpLight/> }
             { direction == "left" && <PiArrowLeftLight/> }
             { direction == "bottom" && <PiArrowDownLight/> }
@@ -25,7 +25,7 @@ function NeighborMark({ direction, page }) {
     );
 }
 
-const MapFeatures = memo(function MapFeatures({ page }) {
+const MapFeatures = memo(function MapFeatures({ page, className }) {
     const features = useSelector(state => state.map?.features) ?? [];
 
     const pxPerMm = 96 / 25.4;
@@ -41,7 +41,7 @@ const MapFeatures = memo(function MapFeatures({ page }) {
     };
 
     return (
-        <svg viewBox={viewBox}>
+        <svg viewBox={viewBox} className={className}>
             { features.map(feature => getFeatureFromJson(feature).render(project)) }
         </svg>
     );
@@ -58,6 +58,12 @@ export default function AtlasPage({ page, onLoad }) {
     const spineMargin = `${page.size.printable.spineMargin}mm`;
     const landscape = page.size.printable.width > page.size.printable.height;
     const even = page.number % 2 == 0;
+    const internal = page.size.printable.baseMargin < 10;
+
+    const evenOdd = even ? "even" : "odd";
+    const landscapePotrait = landscape ? "landscape" : "portrait";
+    const internalExternal = internal ? "internal" : "external";
+    const variant = `${evenOdd} ${landscapePotrait} ${internalExternal}`;
 
     const printableStyle = {
         width: `${page.size.printable.width}mm`,
@@ -71,30 +77,34 @@ export default function AtlasPage({ page, onLoad }) {
     const directions = ["top", "left", "bottom", "right"];
 
     return (
-        <section className="atlas-page">
+        <section className={"atlas-page"}>
             <div className="printable" style={printableStyle}>
-                <img src={pageSrc} onLoad={() => onLoad(page.id)}/>
-                <MapFeatures page={page}/>
-            </div>
+                <img className="tiles" src={pageSrc} onLoad={() => onLoad(page.id)}/>
+                <MapFeatures className="vector-layer" page={page}/>
 
-            <p className={`page-number ${even ? "even" : "odd"}`}>{ page.number }</p>
-
-            {
-                page.number == 1 && <p className="map-name">{ mapName }</p>
-            }
-            {
-                page.number == 1 && <p className="credits">Printed with PrintMyOSM</p>
-            }
-            {
-                directions.map(
-                    direction => page.neighbors[direction] != null && (
-                        <NeighborMark key={direction} direction={direction} page={page.neighbors[direction]}/>
+                <p className={`page-number ${variant}`}>{ page.number }</p>
+                {
+                    page.number == 1 && <p className={`map-name ${variant}`}>{ mapName }</p>
+                }
+                {
+                    page.number == 1 && <p className={`credits ${variant}`}>Printed with PrintMyOSM</p>
+                }
+                {
+                    directions.map(
+                        direction => page.neighbors[direction] != null && (
+                            <NeighborMark
+                                key={direction}
+                                direction={direction}
+                                variant={variant}
+                                page={page.neighbors[direction]}
+                            />
+                        )
                     )
-                )
-            }
-            {
-                scale && <p className="scale">{ scale.label } ({ scale.description })</p>
-            }
+                }
+                {
+                    scale && <p className={`scale ${variant}`}>{ scale.label } ({ scale.description })</p>
+                }
+            </div>
         </section>
     );
 }

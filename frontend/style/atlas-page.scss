@@ -1,6 +1,5 @@
 .atlas-page {
     display: flex;
-    position: relative;
 
     width: 100vw;
     height: 100vh;
@@ -9,100 +8,135 @@
     justify-content: center;
     align-items: center;
 
+    $page: &;
+
     .printable {
         position: relative;
 
-        & > * {
+        .tiles, .vector-layer {
             position: absolute;
             top: 0;
             left: 0;
 
             width: 100%;
         }
-    }
 
-    p {
-        position: absolute;
+        p {
+            position: absolute;
 
-        padding-block: 0.5rem;
-        padding-inline: 1rem;
-        margin: 0;
+            padding-block: 0.5rem;
+            margin: 0;
 
-        &.page-number {
-            width: 1cm;
-            box-sizing: border-box;
+            &.internal {
+                padding-inline: 0.5rem;
+            }
 
-            text-align: center;
-            font-weight: 400;
+            &.map-name {
+                font-weight: 400;
 
-            bottom: 0;
+                left: 0;
+                right: 0;
 
-            &.odd {
+                &.internal { top: 0; }
+                &.external { bottom: 100%; }
+            }
+            &.credits {
+                left: 0;
                 right: 0;
                 text-align: right;
+
+                &.internal { top: 0; }
+                &.external { bottom: 100%; }
             }
-            &.even {
-                left: 0;
-                text-align: left;
-            }
-        }
-
-        &.map-name {
-            top: 0;
-            left: 1cm;
-            padding-left: 0;
-
-            font-weight: 400;
-        }
-
-        &.credits {
-            top: 0;
-            right: 1cm;
-            padding-right: 0;
-        }
-
-        &.neighbor {
-            text-align: center;
-            font-size: 10pt;
-
-            &.top {
-                top: 0;
+            &.scale {
                 left: 0;
                 right: 0;
-            }
-            &.left {
-                top: 0;
-                left: 0;
-                bottom: 0;
-            }
-            &.bottom {
-                bottom: 0;
-                left: 0;
-                right: 0;
-            }
-            &.right {
-                top: 0;
-                right: 0;
-                bottom: 0;
-            }
 
-            &.left, &.right {
-                writing-mode: sideways-lr;
+                &.landscape {
+                    &.even {
+                        &.internal { top: 0; }
+                        &.external { bottom: 100%; }
+                    }
+                    &.odd {
+                        &.internal { bottom: 0; }
+                        &.external { top: 100%; }
+                    }
+                }
+
+                &.portrait {
+                    &.internal { bottom: 0; }
+                    &.external { top: 100%; }
+
+                    &.even {
+                        text-align: left;
+                        margin-left: 1cm;
+                    }
+                    &.odd {
+                        text-align: right;
+                        margin-right: 1cm;
+                    }
+                }
             }
+            &.page-number {
+                width: 1cm;
+                text-align: center;
+                font-weight: 400;
 
-            svg {
-                height: 1.2em;
-                width: 1.2em;
-                margin-block-end: -0.2em;
+                &.internal {
+                    padding-inline: 0;
+                }
+
+                &.odd {
+                    &.internal { bottom: 0; right: 0; }
+                    &.external { top: 100%; left: 100%; }
+                }
+                &.even {
+                    &.portrait {
+                        &.internal { bottom: 0; left: 0; }
+                        &.external { top: 100%; right: 100%; }
+                    }
+                    &.landscape {
+                        &.internal { top: 0; right: 0; }
+                        &.external { bottom: 100%; left: 100%; }
+                    }
+                }
             }
-        }
+            &.neighbor {
+                text-align: center;
 
-        &.scale {
-            bottom: 0;
-            left: 1cm;
-            padding-left: 0;
+                &.left, &.right {
+                    writing-mode: sideways-lr;
+                }
 
-            font-size: 10pt;
+                &.top {
+                    left: 0;
+                    right: 0;
+
+                    &.internal { top: 0; }
+                    &.external { bottom: 100%; }
+                }
+                &.bottom {
+                    left: 0;
+                    right: 0;
+
+                    &.internal { bottom: 0; }
+                    &.external { top: 100%; }
+                }
+                &.left {
+                    top: 0;
+                    bottom: 0;
+
+                    &.internal { left: 0; }
+                    &.external { right: 100%; }
+                }
+                &.right {
+                    top: 0;
+                    bottom: 0;
+
+                    &.internal { right: 0; }
+                    &.external { left: 100%; }
+                }
+            }
         }
     }
 }

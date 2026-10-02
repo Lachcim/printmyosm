@@ -8,7 +8,7 @@ import Spinner from "./spinner";
 import "../style/print-button";
 
 export default function PrintButton({ atlas }) {
-    const [atlasViewReady, setAtlasViewReady] = useState(false);
+    const [atlasViewReady, setAtlasViewReady] = useState(atlas.pages.length != 0);
 
     const readyTiles = atlas.jobProgress?.tiles;
     const readyPages = atlas.jobProgress?.pages.length;
